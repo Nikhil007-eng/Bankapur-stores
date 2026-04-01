@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Bankapur Stores | Secure Login</title>
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#22c55e">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     
     <style>
@@ -14,7 +16,6 @@
             --text-main: #0f172a;
             --text-gray: #64748b;
             --border: #e2e8f0;
-            --accent-glow: rgba(34, 197, 94, 0.15);
         }
 
         /* AMOLED Dark Mode */
@@ -24,7 +25,6 @@
             --text-main: #ffffff;
             --text-gray: #a1a1aa;
             --border: #1a1a1a;
-            --accent-glow: rgba(34, 197, 94, 0.3);
         }
 
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
@@ -44,12 +44,12 @@
 
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* Non-edgy square logo (Squircle) */
+        /* Non-edgy square logo (Squircle) - Glow Removed */
         .logo-box {
             width: 72px; height: 72px; background: var(--primary);
             border-radius: 18px; margin: 0 auto 25px auto;
             display: flex; align-items: center; justify-content: center;
-            overflow: hidden; box-shadow: 0 10px 25px var(--accent-glow);
+            overflow: hidden;
         }
         .logo-box img { width: 100%; height: 100%; object-fit: cover; }
 
@@ -64,21 +64,19 @@
             width: 100%; height: 52px; background: var(--surface);
             border: 1px solid var(--border); border-radius: 12px;
             padding: 0 16px; font-size: 16px; color: var(--text-main);
-            outline: none; transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            outline: none; transition: 0.3s;
         }
-        input:focus { border-color: var(--primary); box-shadow: 0 0 0 4px var(--accent-glow); }
+        input:focus { border-color: var(--primary); }
 
         .fixed-input { background: rgba(128,128,128,0.05); color: var(--text-gray); border-style: dashed; cursor: not-allowed; }
 
-        /* OTP Input Boxes */
+        /* OTP Grid */
         .otp-container { display: flex; justify-content: center; gap: 12px; margin: 25px 0; }
         .otp-input {
             width: 55px; height: 65px; text-align: center; font-size: 24px; font-weight: 800;
             border-radius: 14px; background: var(--surface); border: 1px solid var(--border);
-            padding: 0;
         }
 
-        /* Countdown Timer */
         .timer-box { text-align: center; margin: 15px 0; font-size: 14px; color: var(--text-gray); font-weight: 600; }
         .timer-box span { color: var(--primary); font-variant-numeric: tabular-nums; }
 
@@ -89,9 +87,8 @@
             color: white; border: none; border-radius: 14px;
             font-weight: 700; font-size: 17px; margin-top: 10px;
             cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 12px;
-            transition: all 0.3s;
         }
-        .primary-btn:active { transform: scale(0.96); opacity: 0.9; }
+        .primary-btn:active { transform: scale(0.96); }
 
         .status-msg { text-align: center; font-size: 13px; margin-top: 25px; color: var(--text-gray); }
         .status-msg b { color: var(--primary); cursor: pointer; }
@@ -104,29 +101,28 @@
 
         <div id="loginScreen">
             <header>
-                <h1>Bankapur stores</h1>
-                <p>Fill details to get started</p>
+                <h1>Initialize</h1>
+                <p>Register session for Harapanahalli</p>
             </header>
 
-            <div class="group"><label>Full Name</label><input type="text" id="uName" placeholder="Your name.."></div>
+            <div class="group"><label>Full Name</label><input type="text" id="uName" placeholder="e.g. Nikhil"></div>
             <div class="group"><label>Phone Number</label><input type="tel" id="uPhone" placeholder="+91"></div>
             
-            <div style="margin: 20px 0 10px 4px; font-size: 11px; font-weight: 900; color: var(--primary); letter-spacing: 1px;">DELIVERY ADDRESS</div>
-            
-            <div class="group"><label>Door No</label><input type="text" id="uDoor" placeholder="Flat/House No"></div>
-            <div class="group"><label>Street</label><input type="text" id="uStreet" placeholder="Street Name"></div>
-            <div class="group"><label>Area</label><input type="text" id="uArea" placeholder="Locality/Ward"></div>
+            <div style="margin: 20px 0 10px 4px; font-size: 11px; font-weight: 900; color: var(--primary);">DELIVERY ADDRESS</div>
+            <div class="group"><label>Door No</label><input type="text" id="uDoor"></div>
+            <div class="group"><label>Street</label><input type="text" id="uStreet"></div>
+            <div class="group"><label>Area</label><input type="text" id="uArea"></div>
             <div class="group"><label>City</label><input type="text" value="Harapanahalli" class="fixed-input" readonly tabindex="-1"></div>
 
             <button class="primary-btn" id="reqBtn" onclick="requestLogin()">
-                Login<i class="fa-solid fa-chevron-right"></i>
+                Request Access <i class="fa-solid fa-chevron-right"></i>
             </button>
         </div>
 
         <div id="otpScreen">
             <header>
                 <h1>Verification</h1>
-                <p id="otpSubText">Enter the 4-digit code sent to You</p>
+                <p>Enter the 4-digit code sent to Nikhil</p>
             </header>
 
             <div class="otp-container">
@@ -136,14 +132,9 @@
                 <input type="number" class="otp-input" oninput="limitInput(this)" id="otp4">
             </div>
 
-            <div class="timer-box">Session expires in <span id="timer">10:00</span></div>
-
-            <button class="primary-btn" onclick="verifyAccess()">
-                Confirm & Enter <i class="fa-solid fa-circle-check"></i>
-            </button>
-
-            <p class="status-msg">Wrong info? <b onclick="location.reload()">Go back and edit</b></p>
-            <p class="status-msg">problem with login ask developer(7019542310)</p>
+            <div class="timer-box">Expires in <span id="timer">10:00</span></div>
+            <button class="primary-btn" onclick="verifyAccess()">Confirm & Enter</button>
+            <p class="status-msg">Wrong info? <b onclick="location.reload()">Edit Details</b></p>
         </div>
     </div>
 
@@ -152,31 +143,25 @@
         const CHAT_ID = "7217028526";
         let localSecretCode = "";
 
-        // Apply Dark Mode if stored
+        // Dark Mode Sync
         if(localStorage.getItem('bankapur_amoled') === 'true') document.body.classList.add('dark-mode');
 
-        function moveFocus(current, nextId) {
-            if (current.value.length >= 1) {
-                document.getElementById(nextId).focus();
-            }
+        // PWA Service Worker Registration
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('sw.js').then(() => console.log("SW Registered"));
         }
 
-        function limitInput(current) {
-            if (current.value.length > 1) current.value = current.value.slice(0, 1);
-        }
+        function moveFocus(current, nextId) { if (current.value.length >= 1) document.getElementById(nextId).focus(); }
+        function limitInput(current) { if (current.value.length > 1) current.value = current.value.slice(0, 1); }
 
         function startTimer() {
             let duration = 600; 
             const display = document.getElementById('timer');
             const countdown = setInterval(() => {
-                let minutes = Math.floor(duration / 60);
-                let seconds = duration % 60;
-                display.textContent = `${minutes < 10 ? '0' : ''}${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
-                if (--duration < 0) {
-                    clearInterval(countdown);
-                    alert("Session expired. Please request again.");
-                    location.reload();
-                }
+                let mins = Math.floor(duration / 60);
+                let secs = duration % 60;
+                display.textContent = `${mins < 10 ? '0' : ''}${mins}:${secs < 10 ? '0' : ''}${secs}`;
+                if (--duration < 0) { clearInterval(countdown); location.reload(); }
             }, 1000);
         }
 
@@ -186,20 +171,15 @@
                 phone: document.getElementById('uPhone').value,
                 door: document.getElementById('uDoor').value,
                 street: document.getElementById('uStreet').value,
-                area: document.getElementById('uArea').value,
-                city: "Harapanahalli"
+                area: document.getElementById('uArea').value
             };
-
-            if(!data.name || !data.phone || !data.area) return alert("Please fill all details");
+            if(!data.name || !data.phone) return alert("Required fields missing");
 
             localSecretCode = Math.floor(1000 + Math.random() * 9000).toString();
-
-            const text = `🚨 *LOGIN REQUEST*%0A👤 *Name:* ${data.name}%0A📞 *Phone:* ${data.phone}%0A🏠 *Addr:* ${data.door}, ${data.street}%0A📍 *Area:* ${data.area}%0A🔑 *CODE:* \`${localSecretCode}\``;
-            const url = `https://api.telegram.org/bot${BOT_TOKEN}/sendMessage?chat_id=${CHAT_ID}&text=${text}&parse_mode=Markdown`;
-
-            document.getElementById('reqBtn').innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Processing...';
-
-            fetch(url).then(res => {
+            const text = `🚨 *LOGIN REQUEST*%0A👤 *Name:* ${data.name}%0A📞 *Phone:* ${data.phone}%0A🏠 *Addr:* ${data.door}, ${data.street}%0A🔑 *CODE:* \`${localSecretCode}\``;
+            
+            fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage?chat_id=${CHAT_ID}&text=${text}&parse_mode=Markdown`)
+            .then(res => {
                 if(res.ok) {
                     document.getElementById('loginScreen').style.display = 'none';
                     document.getElementById('otpScreen').style.display = 'block';
@@ -210,19 +190,11 @@
         }
 
         function verifyAccess() {
-            const code = document.getElementById('otp1').value + 
-                         document.getElementById('otp2').value + 
-                         document.getElementById('otp3').value + 
-                         document.getElementById('otp4').value;
-
+            const code = document.getElementById('otp1').value + document.getElementById('otp2').value + document.getElementById('otp3').value + document.getElementById('otp4').value;
             if(code === localSecretCode) {
-                const profile = JSON.parse(localStorage.getItem('pendingUser'));
-                localStorage.setItem('userProfile', JSON.stringify(profile));
-                localStorage.removeItem('pendingUser');
+                localStorage.setItem('userProfile', localStorage.getItem('pendingUser'));
                 window.location.href = "stores.html";
-            } else {
-                alert("Incorrect code. Ask Nikhil for the 4-digit number.");
-            }
+            } else { alert("Incorrect code."); }
         }
     </script>
 </body>
