@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Groceries | Bankapur Stores</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    
+    <style>
+        :root {
+            --bg: #ffffff;
+            --surface: #f8fafc;
+            --primary: #22c55e;
+            --text-main: #0f172a;
+            --text-gray: #64748b;
+            --border: #e2e8f0;
+        }
+
+        body.dark-mode {
+            --bg: #000000;
+            --surface: #0a0a0a;
+            --text-main: #ffffff;
+            --text-gray: #a1a1aa;
+            --border: #1a1a1a;
+        }
+
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; font-family: 'Inter', sans-serif; }
+        body { background-color: var(--bg); color: var(--text-main); margin: 0; transition: 0.3s; overflow-x: hidden; }
+
+        header {
+            height: 75px; padding: 0 20px; display: flex; align-items: center; justify-content: space-between;
+            background: var(--bg); border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 100;
+        }
+        .header-left { display: flex; align-items: center; gap: 12px; }
+        
+        /* Back Button Style */
+        #back-nav { font-size: 22px; cursor: pointer; display: none; padding-right: 5px; color: var(--text-main); }
+
+        .logo-sq { width: 42px; height: 42px; background: var(--primary); border-radius: 10px; overflow: hidden; flex-shrink: 0; }
+        .logo-sq img { width: 100%; height: 100%; object-fit: cover; }
+        
+        .brand-text b { font-size: 17px; display: block; }
+        .brand-text small { color: var(--primary); font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; }
+
+        .cart-btn { position: relative; font-size: 24px; cursor: pointer; color: var(--text-main); padding: 5px; }
+        #cart-count { 
+            position: absolute; top: -2px; right: -5px; background: var(--primary); 
+            color: white; font-size: 10px; padding: 2px 6px; border-radius: 10px; font-weight: 800; border: 2px solid var(--bg);
+        }
+
+        .search-container { padding: 15px 20px; }
+        .search-bar { width: 100%; height: 50px; background: var(--surface); border: 1px solid var(--border); border-radius: 15px; padding: 0 15px; font-size: 16px; color: var(--text-main); outline: none; }
+
+        .category-bar { display: flex; overflow-x: auto; gap: 10px; padding: 0 20px 15px 20px; scrollbar-width: none; }
+        .blob { padding: 9px 20px; background: var(--surface); border: 1px solid var(--border); border-radius: 25px; font-size: 13px; font-weight: 600; cursor: pointer; white-space: nowrap; }
+        .blob.active { background: var(--primary); color: white; border-color: var(--primary); }
+
+        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; padding: 10px 20px 120px 20px; }
+        .card { background: var(--surface); border: 1px solid var(--border); border-radius: 20px; padding: 12px; text-align: center; }
+        .p-img { width: 100%; aspect-ratio: 1/1; background: #eee; border-radius: 15px; margin-bottom: 10px; overflow: hidden; }
+        .p-img img { width: 100%; height: 100%; object-fit: cover; }
+        .p-name { font-size: 14px; font-weight: 700; height: 35px; overflow: hidden; margin-bottom: 5px; }
+        .p-price { color: var(--primary); font-weight: 800; font-size: 16px; margin-bottom: 12px; }
+
+        .qty-ctrl { display: flex; align-items: center; justify-content: center; gap: 10px; background: var(--bg); padding: 5px; border-radius: 12px; border: 1px solid var(--border); }
+        .qty-btn { background: none; border: none; color: var(--primary); font-size: 20px; font-weight: 900; cursor: pointer; }
+        .qty-val { width: 30px; text-align: center; border: none; background: transparent; color: var(--text-main); font-weight: 700; }
+
+        .add-btn { width: 100%; height: 40px; background: var(--primary); color: white; border: none; border-radius: 12px; margin-top: 10px; font-weight: 700; cursor: pointer; }
+
+        .screen { display: none; }
+        .screen.active { display: block; animation: fadeIn 0.3s ease; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+        .option-card { border: 1px solid var(--border); border-radius: 18px; padding: 18px; margin: 0 20px 12px 20px; cursor: pointer; position: relative; transition: 0.2s; }
+        .option-card.selected { border-color: var(--primary); background: rgba(34, 197, 94, 0.08); }
+        .option-card i.check-mark { position: absolute; right: 18px; top: 50%; transform: translateY(-50%); color: var(--primary); display: none; font-size: 22px; }
+        .option-card.selected i.check-mark { display: block; }
+        
+        .notice-text { font-size: 11px; color: var(--primary); font-weight: 600; margin-top: 8px; display: none; line-height: 1.4; }
+        .address-box { padding: 15px 20px; margin: 0 20px 20px 20px; background: var(--surface); border: 1px dashed var(--primary); border-radius: 15px; font-size: 13px; display: none; }
+
+        .bill-banner { background: var(--surface); border: 2px solid var(--primary); border-radius: 20px; padding: 25px; margin: 20px; text-align: center; }
+
+        .footer-btn { position: fixed; bottom: 20px; left: 20px; right: 20px; height: 62px; background: var(--primary); color: white; border-radius: 18px; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 18px; cursor: pointer; border: none; }
+
+        #app-toast { position: fixed; bottom: 100px; left: 50%; transform: translateX(-50%); background: #222; color: #fff; padding: 14px 28px; border-radius: 50px; font-size: 14px; font-weight: 600; z-index: 9999; display: none; box-shadow: 0 8px 20px rgba(0,0,0,0.4); }
+
+        #bill-render { width: 350px; background: #fff; color: #000; padding: 30px; position: fixed; left: -3000px; font-family: monospace; }
+    </style>
+</head>
+<body>
+
+    <div id="app-toast">Toast Message</div>
+
+    <header>
+        <div class="header-left">
+            <i class="fa-solid fa-chevron-left" id="back-nav" onclick="history.back()"></i>
+            <div class="logo-sq"><img src="logo.png" alt="B"></div>
+            <div class="brand-text">
+                <b>Bankapur Store</b>
+                <small>Groceries</small>
+            </div>
+        </div>
+        <div class="cart-btn" onclick="showScreen('cart-screen')">
+            <i class="fa-solid fa-bag-shopping"></i>
+            <span id="cart-count">0</span>
+        </div>
+    </header>
+
+    <div id="shop-screen" class="screen active">
+        <div class="search-container"><input type="text" class="search-bar" placeholder="Search product..." oninput="doSearch(this.value)"></div>
+        <div class="category-bar">
+            <div class="blob active" onclick="doCat('All', this)">All</div>
+            <div class="blob" onclick="doCat('Groceries', this)">Groceries</div>
+            <div class="blob" onclick="doCat('Soaps', this)">Soaps & Pastes</div>
+            <div class="blob" onclick="doCat('Biscuits', this)">Biscuits</div>
+        </div>
+        <div class="grid" id="productGrid"></div>
+    </div>
+
+    <div id="cart-screen" class="screen">
+        <div style="padding: 20px; font-weight: 800; font-size: 22px;">Your Cart</div>
+        <div id="cart-items"></div>
+        <div class="option-card" style="cursor:default; margin-top:10px;">
+            <div style="display:flex; justify-content: space-between;"><span>Items Subtotal</span><b id="subtotal-val">₹0</b></div>
+        </div>
+        <button class="footer-btn" onclick="showScreen('delivery-screen')">Select Delivery</button>
+    </div>
+
+    <div id="delivery-screen" class="screen">
+        <div style="padding: 20px; font-weight: 800; font-size: 22px;">Delivery Method</div>
+        <div class="option-card" onclick="handleDelivery('Door Delivery', 29, this, false)">
+            <div style="display:flex; justify-content: space-between; width: 85%;"><b>Door Delivery</b> <b>₹29</b></div>
+            <div class="notice-text">Orders delivered 6 PM onwards. Charges reduced if within 500m radius.</div>
+            <i class="fa-solid fa-circle-check check-mark"></i>
+        </div>
+        <div class="option-card" onclick="handleDelivery('Quick Delivery', 45, this, false)">
+            <div style="display:flex; justify-content: space-between; width: 85%;"><b>Quick Delivery</b> <b>₹45</b></div>
+            <div class="notice-text">Your order will be delivered within an hour.</div>
+            <i class="fa-solid fa-circle-check check-mark"></i>
+        </div>
+        <div id="address-info" class="address-box">
+            <i class="fa-solid fa-truck" style="color:var(--primary); margin-right:8px;"></i>
+            Delivering to: <b id="user-addr-text"></b>
+        </div>
+        <div class="option-card" onclick="handleDelivery('Self Pickup', 0, this, true)">
+            <div style="display:flex; justify-content: space-between; width: 85%;"><b>Self Pickup</b> <b>₹0</b></div>
+            <div class="notice-text">You can pick up once the store sends a notification.</div>
+            <i class="fa-solid fa-circle-check check-mark"></i>
+        </div>
+        <button class="footer-btn" onclick="navToPayment()">Continue to Payment</button>
+    </div>
+
+    <div id="payment-screen" class="screen">
+        <div class="bill-banner">
+            <div style="font-size: 14px; color: var(--text-gray); margin-bottom: 5px;">Final Total Bill</div>
+            <div id="payable-total" style="font-size: 36px; font-weight: 900; color: var(--primary);">₹0</div>
+        </div>
+        <div style="padding: 10px 20px; font-weight: 800; font-size: 20px;">Payment Options</div>
+        <div class="option-card" onclick="handlePayment('Cash on Delivery', this)">
+            <b>Cash on Delivery</b> <i class="fa-solid fa-circle-check check-mark"></i>
+        </div>
+        <div class="option-card" onclick="handlePayment('Online Payment', this)">
+            <b>Online Payment</b>
+            <div id="qr-display" style="display:none; text-align:center; margin-top:15px;">
+                <img src="qr_placeholder.png" style="width:140px; border-radius:12px;">
+                <p style="font-size:11px; color:var(--text-gray); margin-top:8px;">Scan to pay: PhonePe • GPay • Paytm</p>
+            </div>
+            <i class="fa-solid fa-circle-check check-mark"></i>
+        </div>
+        <button class="footer-btn" onclick="placeFinalOrder()">Complete Order</button>
+    </div>
+
+    <div id="success-screen" class="screen" style="text-align:center; padding-top:80px;">
+        <i class="fa-solid fa-circle-check" style="font-size:80px; color:var(--primary);"></i>
+        <h1 style="margin-top:25px;">Order Placed!</h1>
+        <button class="footer-btn" style="bottom:100px; background:#333;" onclick="saveBillPNG()">Download Bill (PNG)</button>
+        <button class="footer-btn" onclick="startNew()">Continue Shopping</button>
+    </div>
+
+    <div id="bill-render">
+        <center><img src="logo.png" width="50"><br><b style="font-size:18px;">BANKAPUR STORES</b></center><br>
+        <div style="font-size:13px; line-height:1.6;">
+            Customer: <span id="bill-un"></span><br>
+            Phone: <span id="bill-ph"></span><br>
+            Address: <span id="bill-ad"></span><br>
+            Payment: <span id="bill-py"></span><br>
+            Delivery: <span id="bill-dl"></span>
+        </div><hr>
+        <table width="100%" style="font-size:12px; text-align:left;">
+            <thead><tr><th>Item</th><th>Qty</th><th>Rate</th><th>Total</th></tr></thead>
+            <tbody id="bill-body"></tbody>
+        </table><hr>
+        <div style="text-align:right; font-size:18px;"><b>Total: ₹<span id="bill-total"></span></b></div>
+    </div>
+
+    <script>
+        const BOT_TOKEN = "8668013778:AAEnWA0uY3tDUOQP1uHQEVJdcAGaWgfy4eA";
+        const CHAT_ID = "7217028526";
+
+        let cart = [];
+        let dFee = -1;
+        let dLabel = "";
+        let pMode = "";
+
+        const items = [
+            { id: 1, name: "Basmati Rice 1kg", price: 110, cat: "Groceries", img: "rice.png" },
+            { id: 2, name: "Santoor Soap", price: 36, cat: "Soaps", img: "soap.png" },
+            { id: 3, name: "Good Day Biscuits", price: 20, cat: "Biscuits", img: "biscuit.png" },
+            { id: 4, name: "Sunflower Oil 1L", price: 155, cat: "Groceries", img: "oil.png" },
+            { id: 5, name: "Colgate MaxFresh", price: 65, cat: "Soaps", img: "paste.png" }
+        ];
+
+        const profile = JSON.parse(localStorage.getItem('userProfile')) || {};
+
+        window.onload = () => {
+            if(localStorage.getItem('bankapur_amoled') === 'true') document.body.classList.add('dark-mode');
+            genGrid(items);
+            document.getElementById('user-addr-text').innerText = `${profile.door || ''}, ${profile.street || ''}, ${profile.area || ''}, Harapanahalli`;
+            // Push initial state
+            history.replaceState({ screen: 'shop-screen' }, "");
+        };
+
+        // History API Navigation
+        window.onpopstate = (e) => {
+            if (e.state && e.state.screen) showScreen(e.state.screen, false);
+            else showScreen('shop-screen', false);
+        };
+
+        function showToast(m) {
+            const t = document.getElementById('app-toast');
+            t.innerText = m; t.style.display = 'block';
+            setTimeout(() => t.style.display = 'none', 2000);
+        }
+
+        function showScreen(id, push = true) {
+            if(id === 'cart-screen' && cart.length === 0) return showToast("Cart is empty!");
+            
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+            document.getElementById(id).classList.add('active');
+            
+            // Header Back Button visibility
+            document.getElementById('back-nav').style.display = (id === 'shop-screen') ? 'none' : 'block';
+
+            if(id === 'cart-screen') buildCart();
+            if (push) history.pushState({ screen: id }, "");
+        }
+
+        function genGrid(data) {
+            document.getElementById('productGrid').innerHTML = data.map(i => `
+                <div class="card">
+                    <div class="p-img"><img src="${i.img}"></div>
+                    <div class="p-name">${i.name}</div>
+                    <div class="p-price">₹${i.price}</div>
+                    <div class="qty-ctrl"><button class="qty-btn" onclick="adjGrid(${i.id}, -1)">-</button><input type="number" id="v-${i.id}" class="qty-val" value="1"><button class="qty-btn" onclick="adjGrid(${i.id}, 1)">+</button></div>
+                    <button class="add-btn" onclick="buy(${i.id})">ADD TO CART</button>
+                </div>
+            `).join('');
+        }
+
+        function adjGrid(id, d) { let el = document.getElementById(`v-${id}`); let v = parseInt(el.value) + d; if(v < 1) v = 1; el.value = v; }
+
+        function buy(id) {
+            const itm = items.find(x => x.id === id);
+            const q = parseInt(document.getElementById(`v-${id}`).value);
+            const hit = cart.find(x => x.id === id);
+            if(hit) hit.qty += q; else cart.push({...itm, qty: q});
+            syncCart(); showToast(`${itm.name} added!`);
+        }
+
+        function syncCart() { document.getElementById('cart-count').innerText = cart.reduce((s, i) => s + i.qty, 0); }
+
+        function buildCart() {
+            let sub = 0;
+            document.getElementById('cart-items').innerHTML = cart.map((i, idx) => {
+                sub += (i.price * i.qty);
+                return `<div class="option-card" style="display:flex; justify-content:space-between; align-items:center; cursor:default;">
+                    <div style="flex:1;"><b>${i.name}</b><br><small>₹${i.price} / unit</small></div>
+                    <div style="display:flex; align-items:center; gap:10px;">
+                        <div class="qty-ctrl"><button class="qty-btn" onclick="adjCart(${idx}, -1)">-</button><input type="number" class="qty-val" value="${i.qty}" onchange="setCart(${idx}, this.value)"><button class="qty-btn" onclick="adjCart(${idx}, 1)">+</button></div>
+                        <b style="width:50px; text-align:right;">₹${i.price * i.qty}</b>
+                    </div>
+                </div>`;
+            }).join('');
+            document.getElementById('subtotal-val').innerText = `₹${sub}`;
+        }
+
+        function adjCart(idx, d) { cart[idx].qty += d; if(cart[idx].qty < 1) cart.splice(idx, 1); syncCart(); buildCart(); }
+        function setCart(idx, v) { cart[idx].qty = parseInt(v) || 1; syncCart(); buildCart(); }
+
+        // Toggle Selection Logic
+        function handleDelivery(l, f, el, isPickup) {
+            if (dLabel === l) { // Deselect
+                dLabel = ""; dFee = -1;
+                el.classList.remove('selected');
+                el.querySelector('.notice-text').style.display = 'none';
+                document.getElementById('address-info').style.display = 'none';
+            } else { // Select
+                dLabel = l; dFee = f;
+                document.querySelectorAll('#delivery-screen .option-card').forEach(c => {
+                    c.classList.remove('selected');
+                    c.querySelector('.notice-text').style.display = 'none';
+                });
+                el.classList.add('selected'); el.querySelector('.notice-text').style.display = 'block';
+                document.getElementById('address-info').style.display = isPickup ? 'none' : 'block';
+            }
+        }
+
+        function navToPayment() {
+            if(dFee === -1) return showToast("Please select delivery!");
+            let sub = cart.reduce((s, i) => s + (i.price * i.qty), 0);
+            document.getElementById('payable-total').innerText = `₹${sub + dFee}`;
+            showScreen('payment-screen');
+        }
+
+        function handlePayment(m, el) {
+            if (pMode === m) { // Deselect
+                pMode = "";
+                el.classList.remove('selected');
+                document.getElementById('qr-display').style.display = 'none';
+            } else { // Select
+                pMode = m;
+                document.getElementById('qr-display').style.display = m === 'Online Payment' ? 'block' : 'none';
+                el.parentNode.querySelectorAll('.option-card').forEach(c => c.classList.remove('selected'));
+                el.classList.add('selected');
+            }
+        }
+
+        async function placeFinalOrder() {
+            if(!pMode) return showToast("Select payment method!");
+            
+            let sub = cart.reduce((s, i) => s + (i.price * i.qty), 0);
+            let total = sub + dFee;
+            
+            document.getElementById('bill-un').innerText = profile.name || "Customer";
+            document.getElementById('bill-ph').innerText = profile.phone || "";
+            document.getElementById('bill-ad').innerText = `${profile.door || ''}, ${profile.street || ''}, ${profile.area || ''}`;
+            document.getElementById('bill-py').innerText = pMode;
+            document.getElementById('bill-dl').innerText = dLabel;
+            document.getElementById('bill-total').innerText = total;
+
+            // Include Delivery Charge in Bill Rows
+            let rows = cart.map(i => `<tr><td>${i.name}</td><td>${i.qty}</td><td>${i.price}</td><td>${i.qty * i.price}</td></tr>`).join('');
+            rows += `<tr style="border-top:1px solid #ddd"><td>Delivery Fee</td><td>1</td><td>${dFee}</td><td>${dFee}</td></tr>`;
+            document.getElementById('bill-body').innerHTML = rows;
+
+            showScreen('success-screen');
+
+            const canvas = await html2canvas(document.getElementById('bill-render'));
+            canvas.toBlob(blob => {
+                const fd = new FormData();
+                fd.append('chat_id', CHAT_ID); fd.append('photo', blob, 'bill.png');
+                fd.append('caption', `📦 ORDER: ₹${total} | ${profile.name}`);
+                fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendPhoto`, { method: 'POST', body: fd });
+            });
+            cart = []; syncCart();
+        }
+
+        function saveBillPNG() {
+            html2canvas(document.getElementById('bill-render')).then(c => {
+                const a = document.createElement('a'); a.download = 'Bankapur_Order.png'; a.href = c.toDataURL(); a.click();
+            });
+        }
+
+        function startNew() { dFee = -1; dLabel = ""; pMode = ""; document.getElementById('address-info').style.display='none'; showScreen('shop-screen'); }
+        function doCat(c, el) { document.querySelectorAll('.blob').forEach(b => b.classList.remove('active')); el.classList.add('active'); genGrid(c === 'All' ? items : items.filter(i => i.cat === c)); }
+        function doSearch(q) { genGrid(items.filter(i => i.name.toLowerCase().includes(q.toLowerCase()))); }
+    </script>
+</body>
+</html>
