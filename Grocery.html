@@ -33,9 +33,7 @@
             background: var(--bg); border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 100;
         }
         .header-left { display: flex; align-items: center; gap: 12px; }
-        
-        /* Back Button Style */
-        #back-nav { font-size: 22px; cursor: pointer; display: none; padding-right: 5px; color: var(--text-main); }
+        #back-nav { font-size: 22px; cursor: pointer; display: none; color: var(--text-main); }
 
         .logo-sq { width: 42px; height: 42px; background: var(--primary); border-radius: 10px; overflow: hidden; flex-shrink: 0; }
         .logo-sq img { width: 100%; height: 100%; object-fit: cover; }
@@ -43,9 +41,12 @@
         .brand-text b { font-size: 17px; display: block; }
         .brand-text small { color: var(--primary); font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; }
 
-        .cart-btn { position: relative; font-size: 24px; cursor: pointer; color: var(--text-main); padding: 5px; }
+        .header-actions { display: flex; align-items: center; gap: 18px; }
+        .history-btn { font-size: 21px; cursor: pointer; color: var(--text-main); }
+
+        .cart-btn { position: relative; font-size: 24px; cursor: pointer; color: var(--text-main); }
         #cart-count { 
-            position: absolute; top: -2px; right: -5px; background: var(--primary); 
+            position: absolute; top: -5px; right: -8px; background: var(--primary); 
             color: white; font-size: 10px; padding: 2px 6px; border-radius: 10px; font-weight: 800; border: 2px solid var(--bg);
         }
 
@@ -87,7 +88,9 @@
 
         #app-toast { position: fixed; bottom: 100px; left: 50%; transform: translateX(-50%); background: #222; color: #fff; padding: 14px 28px; border-radius: 50px; font-size: 14px; font-weight: 600; z-index: 9999; display: none; box-shadow: 0 8px 20px rgba(0,0,0,0.4); }
 
+        /* BILL DESIGN */
         #bill-render { width: 350px; background: #fff; color: #000; padding: 30px; position: fixed; left: -3000px; font-family: monospace; }
+        .bill-meta { font-size: 10px; line-height: 1.4; color: #444; text-transform: uppercase; }
     </style>
 </head>
 <body>
@@ -103,9 +106,12 @@
                 <small>Groceries</small>
             </div>
         </div>
-        <div class="cart-btn" onclick="showScreen('cart-screen')">
-            <i class="fa-solid fa-bag-shopping"></i>
-            <span id="cart-count">0</span>
+        <div class="header-actions">
+            <i class="fa-solid fa-clock-rotate-left history-btn" onclick="showScreen('orders-screen')"></i>
+            <div class="cart-btn" onclick="showScreen('cart-screen')">
+                <i class="fa-solid fa-bag-shopping"></i>
+                <span id="cart-count">0</span>
+            </div>
         </div>
     </header>
 
@@ -118,6 +124,12 @@
             <div class="blob" onclick="doCat('Biscuits', this)">Biscuits</div>
         </div>
         <div class="grid" id="productGrid"></div>
+    </div>
+
+    <div id="orders-screen" class="screen">
+        <div style="padding: 20px; font-weight: 800; font-size: 22px;">Your Orders</div>
+        <div id="orders-list"></div>
+        <button class="footer-btn" onclick="showScreen('shop-screen')">Back to Shop</button>
     </div>
 
     <div id="cart-screen" class="screen">
@@ -174,7 +186,7 @@
     </div>
 
     <div id="success-screen" class="screen" style="text-align:center; padding-top:80px;">
-        <i class="fa-solid fa-circle-check" style="font-size:80px; color:var(--primary);"></i>
+        <i class="fa-solid fa-circle-check" style="font-size:70px; color:var(--primary);"></i>
         <h1 style="margin-top:25px;">Order Placed!</h1>
         <button class="footer-btn" style="bottom:100px; background:#333;" onclick="saveBillPNG()">Download Bill (PNG)</button>
         <button class="footer-btn" onclick="startNew()">Continue Shopping</button>
@@ -182,17 +194,17 @@
 
     <div id="bill-render">
         <center><img src="logo.png" width="50"><br><b style="font-size:18px;">BANKAPUR STORES</b></center><br>
-        <div style="font-size:13px; line-height:1.6;">
+        <div class="bill-meta">
             Customer: <span id="bill-un"></span><br>
             Phone: <span id="bill-ph"></span><br>
             Address: <span id="bill-ad"></span><br>
             Payment: <span id="bill-py"></span><br>
             Delivery: <span id="bill-dl"></span>
-        </div><hr>
+        </div><hr style="border: none; border-top: 1px dashed #000;">
         <table width="100%" style="font-size:12px; text-align:left;">
             <thead><tr><th>Item</th><th>Qty</th><th>Rate</th><th>Total</th></tr></thead>
             <tbody id="bill-body"></tbody>
-        </table><hr>
+        </table><hr style="border: none; border-top: 1px dashed #000;">
         <div style="text-align:right; font-size:18px;"><b>Total: ₹<span id="bill-total"></span></b></div>
     </div>
 
@@ -219,11 +231,9 @@
             if(localStorage.getItem('bankapur_amoled') === 'true') document.body.classList.add('dark-mode');
             genGrid(items);
             document.getElementById('user-addr-text').innerText = `${profile.door || ''}, ${profile.street || ''}, ${profile.area || ''}, Harapanahalli`;
-            // Push initial state
             history.replaceState({ screen: 'shop-screen' }, "");
         };
 
-        // History API Navigation
         window.onpopstate = (e) => {
             if (e.state && e.state.screen) showScreen(e.state.screen, false);
             else showScreen('shop-screen', false);
@@ -237,14 +247,11 @@
 
         function showScreen(id, push = true) {
             if(id === 'cart-screen' && cart.length === 0) return showToast("Cart is empty!");
-            
             document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
             document.getElementById(id).classList.add('active');
-            
-            // Header Back Button visibility
             document.getElementById('back-nav').style.display = (id === 'shop-screen') ? 'none' : 'block';
-
             if(id === 'cart-screen') buildCart();
+            if(id === 'orders-screen') renderOrders();
             if (push) history.pushState({ screen: id }, "");
         }
 
@@ -290,50 +297,24 @@
         function adjCart(idx, d) { cart[idx].qty += d; if(cart[idx].qty < 1) cart.splice(idx, 1); syncCart(); buildCart(); }
         function setCart(idx, v) { cart[idx].qty = parseInt(v) || 1; syncCart(); buildCart(); }
 
-        // Toggle Selection Logic
         function handleDelivery(l, f, el, isPickup) {
-            if (dLabel === l) { // Deselect
-                dLabel = ""; dFee = -1;
-                el.classList.remove('selected');
-                el.querySelector('.notice-text').style.display = 'none';
-                document.getElementById('address-info').style.display = 'none';
-            } else { // Select
-                dLabel = l; dFee = f;
-                document.querySelectorAll('#delivery-screen .option-card').forEach(c => {
-                    c.classList.remove('selected');
-                    c.querySelector('.notice-text').style.display = 'none';
-                });
-                el.classList.add('selected'); el.querySelector('.notice-text').style.display = 'block';
-                document.getElementById('address-info').style.display = isPickup ? 'none' : 'block';
-            }
+            if (dLabel === l) { dLabel = ""; dFee = -1; el.classList.remove('selected'); el.querySelector('.notice-text').style.display = 'none'; document.getElementById('address-info').style.display = 'none'; }
+            else { dLabel = l; dFee = f; document.querySelectorAll('#delivery-screen .option-card').forEach(c => { c.classList.remove('selected'); c.querySelector('.notice-text').style.display = 'none'; }); el.classList.add('selected'); el.querySelector('.notice-text').style.display = 'block'; document.getElementById('address-info').style.display = isPickup ? 'none' : 'block'; }
         }
 
-        function navToPayment() {
-            if(dFee === -1) return showToast("Please select delivery!");
-            let sub = cart.reduce((s, i) => s + (i.price * i.qty), 0);
-            document.getElementById('payable-total').innerText = `₹${sub + dFee}`;
-            showScreen('payment-screen');
-        }
+        function navToPayment() { if(dFee === -1) return showToast("Please select delivery!"); let sub = cart.reduce((s, i) => s + (i.price * i.qty), 0); document.getElementById('payable-total').innerText = `₹${sub + dFee}`; showScreen('payment-screen'); }
 
-        function handlePayment(m, el) {
-            if (pMode === m) { // Deselect
-                pMode = "";
-                el.classList.remove('selected');
-                document.getElementById('qr-display').style.display = 'none';
-            } else { // Select
-                pMode = m;
-                document.getElementById('qr-display').style.display = m === 'Online Payment' ? 'block' : 'none';
-                el.parentNode.querySelectorAll('.option-card').forEach(c => c.classList.remove('selected'));
-                el.classList.add('selected');
-            }
-        }
+        function handlePayment(m, el) { if (pMode === m) { pMode = ""; el.classList.remove('selected'); document.getElementById('qr-display').style.display = 'none'; } else { pMode = m; document.getElementById('qr-display').style.display = m === 'Online Payment' ? 'block' : 'none'; el.parentNode.querySelectorAll('.option-card').forEach(c => c.classList.remove('selected')); el.classList.add('selected'); } }
 
         async function placeFinalOrder() {
             if(!pMode) return showToast("Select payment method!");
-            
             let sub = cart.reduce((s, i) => s + (i.price * i.qty), 0);
             let total = sub + dFee;
             
+            let orderHistory = JSON.parse(localStorage.getItem('bankapur_orders')) || [];
+            orderHistory.unshift({ id: Date.now(), date: new Date().toLocaleString(), items: [...cart], total: total, delivery: dLabel });
+            localStorage.setItem('bankapur_orders', JSON.stringify(orderHistory));
+
             document.getElementById('bill-un').innerText = profile.name || "Customer";
             document.getElementById('bill-ph').innerText = profile.phone || "";
             document.getElementById('bill-ad').innerText = `${profile.door || ''}, ${profile.street || ''}, ${profile.area || ''}`;
@@ -341,7 +322,6 @@
             document.getElementById('bill-dl').innerText = dLabel;
             document.getElementById('bill-total').innerText = total;
 
-            // Include Delivery Charge in Bill Rows
             let rows = cart.map(i => `<tr><td>${i.name}</td><td>${i.qty}</td><td>${i.price}</td><td>${i.qty * i.price}</td></tr>`).join('');
             rows += `<tr style="border-top:1px solid #ddd"><td>Delivery Fee</td><td>1</td><td>${dFee}</td><td>${dFee}</td></tr>`;
             document.getElementById('bill-body').innerHTML = rows;
@@ -358,12 +338,20 @@
             cart = []; syncCart();
         }
 
-        function saveBillPNG() {
-            html2canvas(document.getElementById('bill-render')).then(c => {
-                const a = document.createElement('a'); a.download = 'Bankapur_Order.png'; a.href = c.toDataURL(); a.click();
-            });
+        function renderOrders() {
+            const history = JSON.parse(localStorage.getItem('bankapur_orders')) || [];
+            const container = document.getElementById('orders-list');
+            if (history.length === 0) { container.innerHTML = '<p style="text-align:center; padding:40px; color:var(--text-gray);">No orders found.</p>'; return; }
+            container.innerHTML = history.map(order => `
+                <div class="option-card" style="cursor:default;">
+                    <div style="display:flex; justify-content:space-between; margin-bottom:5px;"><b style="color:var(--primary);">Order #${order.id.toString().slice(-6)}</b><small style="font-size:10px;">${order.date}</small></div>
+                    <div style="font-size:12px; color:var(--text-gray); margin-bottom:10px;">${order.items.map(i => `${i.name} x ${i.qty}`).join(', ')}</div>
+                    <div style="display:flex; justify-content:space-between; border-top:1px solid var(--border); padding-top:8px;"><span>Total: <b>₹${order.total}</b></span><span style="font-size:11px; font-weight:700;">${order.delivery}</span></div>
+                </div>
+            `).join('');
         }
 
+        function saveBillPNG() { html2canvas(document.getElementById('bill-render')).then(c => { const a = document.createElement('a'); a.download = 'Bankapur_Bill.png'; a.href = c.toDataURL(); a.click(); }); }
         function startNew() { dFee = -1; dLabel = ""; pMode = ""; document.getElementById('address-info').style.display='none'; showScreen('shop-screen'); }
         function doCat(c, el) { document.querySelectorAll('.blob').forEach(b => b.classList.remove('active')); el.classList.add('active'); genGrid(c === 'All' ? items : items.filter(i => i.cat === c)); }
         function doSearch(q) { genGrid(items.filter(i => i.name.toLowerCase().includes(q.toLowerCase()))); }
