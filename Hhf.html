@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Bankapur Stores | Login</title>
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#16a34a">
+    
+    <style>
+        :root {
+            --bg: #ffffff;
+            --surface: #f9fbf9;
+            --primary: #16a34a;
+            --text-dark: #0f172a;
+            --text-gray: #64748b;
+            --border: #e2e8f0;
+        }
+
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+        body {
+            background-color: var(--bg);
+            color: var(--text-dark);
+            font-family: -apple-system, sans-serif;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            min-height: 100vh;
+        }
+
+        .container { width: 100%; max-width: 400px; padding: 40px 24px; }
+
+        .logo-box {
+            width: 72px; height: 72px; background: var(--primary);
+            color: white; margin: 0 auto 24px auto; border-radius: 16px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 32px; font-weight: 800;
+        }
+
+        header { text-align: center; margin-bottom: 32px; }
+        header h1 { font-size: 26px; margin: 0; }
+
+        .form-group { margin-bottom: 16px; }
+        label { display: block; font-size: 13px; font-weight: 600; color: var(--text-gray); margin-bottom: 6px; }
+
+        input {
+            width: 100%; height: 52px; background: var(--surface);
+            border: 1px solid var(--border); border-radius: 12px;
+            padding: 0 16px; font-size: 16px; color: var(--text-dark);
+        }
+
+        .fixed-input { background: #f1f5f9; color: var(--text-gray); border-style: dashed; }
+
+        .address-header {
+            margin: 24px 0 16px 0; font-size: 12px; font-weight: 800;
+            color: var(--primary); text-transform: uppercase; letter-spacing: 1px;
+            display: flex; align-items: center; gap: 10px;
+        }
+
+        .address-header::after { content: ""; flex: 1; height: 1px; background: var(--border); }
+
+        .login-btn {
+            display: flex; align-items: center; justify-content: center;
+            width: 100%; height: 56px; background: var(--primary);
+            color: white; border: none; border-radius: 12px;
+            font-weight: 700; font-size: 17px; margin-top: 24px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <div class="logo-box">B</div>
+        <header>
+            <h1>Welcome</h1>
+            <p>Sign in to <b>Bankapur stores</b></p>
+        </header>
+
+        <form id="loginForm">
+            <div class="form-group">
+                <label>Full Name</label>
+                <input type="text" id="userName" placeholder="Your Name" required>
+            </div>
+            <div class="form-group">
+                <label>Phone No</label>
+                <input type="tel" id="userPhone" placeholder="+91" required>
+            </div>
+
+            <div class="address-header">Address Section</div>
+
+            <div class="form-group"><label>Door No</label><input type="text" id="doorNo" required></div>
+            <div class="form-group"><label>Street</label><input type="text" id="street" required></div>
+            <div class="form-group"><label>Area</label><input type="text" id="area" required></div>
+            <div class="form-group"><label>City</label>
+                <input type="text" value="Harapanahalli" class="fixed-input" id="city" readonly>
+            </div>
+
+            <button type="submit" class="login-btn">Login</button>
+        </form>
+    </div>
+
+    <script>
+        // 1. Save Data to LocalStorage
+        const loginForm = document.getElementById('loginForm');
+        
+        loginForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            
+            const userData = {
+                name: document.getElementById('userName').value,
+                phone: document.getElementById('userPhone').value,
+                door: document.getElementById('doorNo').value,
+                street: document.getElementById('street').value,
+                area: document.getElementById('area').value,
+                city: "Harapanahalli"
+            };
+
+            localStorage.setItem('userProfile', JSON.stringify(userData));
+            window.location.href = "stores.html";
+        });
+
+        // 2. Register Service Worker for PWA
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('sw.js')
+            .then(() => console.log("Service Worker Registered"));
+        }
+    </script>
+</body>
+</html>
