@@ -18,7 +18,6 @@
             --border: #e2e8f0;
         }
 
-        /* AMOLED Dark Mode */
         body.dark-mode {
             --bg: #000000;
             --surface: #0a0a0a;
@@ -41,10 +40,8 @@
         }
 
         .wrapper { width: 100%; max-width: 400px; padding: 40px 24px; animation: fadeIn 0.8s ease; }
-
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* Non-edgy square logo (Squircle) - Glow Removed */
         .logo-box {
             width: 72px; height: 72px; background: var(--primary);
             border-radius: 18px; margin: 0 auto 25px auto;
@@ -70,7 +67,6 @@
 
         .fixed-input { background: rgba(128,128,128,0.05); color: var(--text-gray); border-style: dashed; cursor: not-allowed; }
 
-        /* OTP Grid */
         .otp-container { display: flex; justify-content: center; gap: 12px; margin: 25px 0; }
         .otp-input {
             width: 55px; height: 65px; text-align: center; font-size: 24px; font-weight: 800;
@@ -109,9 +105,9 @@
             <div class="group"><label>Phone Number</label><input type="tel" id="uPhone" placeholder="+91"></div>
             
             <div style="margin: 20px 0 10px 4px; font-size: 11px; font-weight: 900; color: var(--primary);">DELIVERY ADDRESS</div>
-            <div class="group"><label>Door No</label><input type="text" id="uDoor"></div>
-            <div class="group"><label>Street</label><input type="text" id="uStreet"></div>
-            <div class="group"><label>Area</label><input type="text" id="uArea"></div>
+            <div class="group"><label>Door No</label><input type="text" id="uDoor" placeholder="Flat No"></div>
+            <div class="group"><label>Street</label><input type="text" id="uStreet" placeholder="Main St"></div>
+            <div class="group"><label>Area</label><input type="text" id="uArea" placeholder="Locality"></div>
             <div class="group"><label>City</label><input type="text" value="Harapanahalli" class="fixed-input" readonly tabindex="-1"></div>
 
             <button class="primary-btn" id="reqBtn" onclick="requestLogin()">
@@ -141,15 +137,21 @@
     <script>
         const BOT_TOKEN = "8668013778:AAEnWA0uY3tDUOQP1uHQEVJdcAGaWgfy4eA";
         const CHAT_ID = "7217028526";
-        let localSecretCode = "";
 
-        // Dark Mode Sync
-        if(localStorage.getItem('bankapur_amoled') === 'true') document.body.classList.add('dark-mode');
-
-        // PWA Service Worker Registration
-        if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.register('sw.js').then(() => console.log("SW Registered"));
-        }
+        window.onload = () => {
+            // 1. Check for AMOLED
+            if(localStorage.getItem('bankapur_amoled') === 'true') document.body.classList.add('dark-mode');
+            
+            // 2. Check if already logged in
+            if(localStorage.getItem('userProfile')) {
+                window.location.href = "stores.html";
+            }
+            
+            // 3. Register PWA
+            if ('serviceWorker' in navigator) {
+                navigator.serviceWorker.register('sw.js');
+            }
+        };
 
         function moveFocus(current, nextId) { if (current.value.length >= 1) document.getElementById(nextId).focus(); }
         function limitInput(current) { if (current.value.length > 1) current.value = current.value.slice(0, 1); }
@@ -171,12 +173,15 @@
                 phone: document.getElementById('uPhone').value,
                 door: document.getElementById('uDoor').value,
                 street: document.getElementById('uStreet').value,
-                area: document.getElementById('uArea').value
+                area: document.getElementById('uArea').value,
+                city: "Harapanahalli"
             };
             if(!data.name || !data.phone) return alert("Required fields missing");
 
-            localSecretCode = Math.floor(1000 + Math.random() * 9000).toString();
-            const text = `🚨 *LOGIN REQUEST*%0A👤 *Name:* ${data.name}%0A📞 *Phone:* ${data.phone}%0A🏠 *Addr:* ${data.door}, ${data.street}%0A🔑 *CODE:* \`${localSecretCode}\``;
+            const code = Math.floor(1000 + Math.random() * 9000).toString();
+            sessionStorage.setItem('currentOTP', code); // Store in session so it survives refresh
+
+            const text = `🚨 *LOGIN REQUEST*%0A👤 *Name:* ${data.name}%0A📞 *Phone:* ${data.phone}%0A🏠 *Addr:* ${data.door}, ${data.street}%0A📍 *Area:* ${data.area}%0A🔑 *CODE:* \`${code}\``;
             
             fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage?chat_id=${CHAT_ID}&text=${text}&parse_mode=Markdown`)
             .then(res => {
@@ -190,11 +195,18 @@
         }
 
         function verifyAccess() {
-            const code = document.getElementById('otp1').value + document.getElementById('otp2').value + document.getElementById('otp3').value + document.getElementById('otp4').value;
-            if(code === localSecretCode) {
-                localStorage.setItem('userProfile', localStorage.getItem('pendingUser'));
+            const enteredCode = document.getElementById('otp1').value + document.getElementById('otp2').value + document.getElementById('otp3').value + document.getElementById('otp4').value;
+            const correctCode = sessionStorage.getItem('currentOTP');
+
+            if(enteredCode === correctCode) {
+                const pendingData = localStorage.getItem('pendingUser');
+                localStorage.setItem('userProfile', pendingData);
+                localStorage.removeItem('pendingUser');
+                sessionStorage.removeItem('currentOTP');
                 window.location.href = "stores.html";
-            } else { alert("Incorrect code."); }
+            } else { 
+                alert("Incorrect code. Please check your message from Nikhil."); 
+            }
         }
     </script>
 </body>
