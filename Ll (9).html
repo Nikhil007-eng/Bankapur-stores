@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Dashboard | Bankapur Stores</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    
+    <style>
+        :root {
+            --bg: #ffffff;
+            --surface: #f8fafc;
+            --primary: #22c55e;
+            --text-main: #0f172a;
+            --text-gray: #64748b;
+            --border: #e2e8f0;
+            --glass: rgba(255, 255, 255, 0.85);
+        }
+
+        /* AMOLED Dark Mode */
+        body.dark-mode {
+            --bg: #000000; /* Pure Black */
+            --surface: #0a0a0a; /* Deep Charcoal Cards */
+            --text-main: #ffffff;
+            --text-gray: #a1a1aa;
+            --border: #1a1a1a;
+            --glass: rgba(0, 0, 0, 0.85);
+        }
+
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+        body {
+            background-color: var(--bg);
+            color: var(--text-main);
+            font-family: 'Inter', -apple-system, sans-serif;
+            margin: 0;
+            transition: background 0.3s ease;
+            overflow-x: hidden;
+        }
+
+        /* Top Dashboard */
+        .dashboard {
+            height: 70px;
+            padding: 0 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: var(--bg);
+            border-bottom: 1px solid var(--border);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .brand { display: flex; align-items: center; gap: 12px; }
+        
+        .logo-box {
+            width: 40px; height: 40px;
+            background: var(--primary);
+            border-radius: 12px;
+            display: flex; align-items: center; justify-content: center;
+            overflow: hidden;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.2);
+        }
+
+        .logo-box img { width: 100%; height: 100%; object-fit: cover; }
+
+        .brand-name { font-weight: 800; font-size: 16px; letter-spacing: -0.5px; }
+
+        .welcome-badge {
+            font-size: 12px; font-weight: 700; color: var(--primary);
+            background: rgba(34, 197, 94, 0.1);
+            padding: 6px 14px; border-radius: 20px;
+        }
+
+        /* Menu Trigger */
+        .action-bar { padding: 10px 20px; display: flex; justify-content: flex-end; }
+        .menu-btn { background: none; border: none; font-size: 24px; color: var(--text-main); cursor: pointer; padding: 8px; }
+
+        /* Store Content */
+        .container { padding: 0 20px; }
+        h2 { font-size: 24px; font-weight: 800; margin: 10px 0 25px 0; }
+
+        .store-list { display: flex; flex-direction: column; gap: 16px; }
+
+        .store-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 20px;
+            display: flex; align-items: center; gap: 20px;
+            text-decoration: none; color: inherit;
+            transition: transform 0.2s ease;
+        }
+
+        .store-card:active { transform: scale(0.97); }
+
+        .icon-container {
+            width: 54px; height: 54px; 
+            background: white; border-radius: 14px;
+            display: flex; align-items: center; justify-content: center;
+            color: var(--primary); font-size: 22px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+
+        body.dark-mode .icon-container { background: var(--bg); border: 1px solid var(--border); }
+
+        .details b { display: block; font-size: 17px; margin-bottom: 2px; }
+        .details span { font-size: 13px; color: var(--text-gray); }
+
+        /* Custom Floating Settings Menu */
+        .side-nav {
+            position: fixed; top: 0; right: -100%; width: 85%; max-width: 320px; height: 100%;
+            background: var(--glass); backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px);
+            border-left: 1px solid var(--border);
+            z-index: 200; padding: 30px 24px;
+            transition: right 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .side-nav.active { right: 0; }
+
+        .menu-head { display: flex; align-items: center; gap: 20px; margin-bottom: 40px; }
+        .back-icon { font-size: 22px; color: var(--primary); cursor: pointer; }
+        .menu-title { font-weight: 800; font-size: 22px; }
+
+        .setting-card {
+            background: rgba(128, 128, 128, 0.08);
+            border: 1px solid var(--border);
+            border-radius: 18px;
+            padding: 20px; margin-bottom: 15px;
+        }
+
+        .setting-label { display: flex; align-items: center; gap: 12px; font-weight: 700; font-size: 15px; margin-bottom: 15px; }
+        .setting-label i { color: var(--primary); text-align: center; width: 20px; }
+
+        /* Custom In-App Language Toggle (No Popups) */
+        .lang-switch {
+            display: flex; background: var(--bg); border-radius: 10px; padding: 4px; border: 1px solid var(--border);
+        }
+
+        .lang-btn {
+            flex: 1; border: none; background: none; padding: 8px; border-radius: 8px;
+            font-size: 13px; font-weight: 700; color: var(--text-gray); cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .lang-btn.active { background: var(--primary); color: white; }
+
+        /* AMOLED Toggle Switch */
+        .switch-row { display: flex; justify-content: space-between; align-items: center; }
+        .switch { position: relative; display: inline-block; width: 44px; height: 24px; }
+        .switch input { opacity: 0; width: 0; height: 0; }
+        .slider { 
+            position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; 
+            background: #334155; transition: .3s; border-radius: 30px; 
+        }
+        .slider:before { 
+            position: absolute; content: ""; height: 18px; width: 18px; left: 3px; bottom: 3px; 
+            background: white; transition: .3s; border-radius: 50%; 
+        }
+        input:checked + .slider { background: var(--primary); }
+        input:checked + .slider:before { transform: translateX(20px); }
+
+    </style>
+</head>
+<body>
+
+    <div class="dashboard">
+        <div class="brand">
+            <div class="logo-box">
+                <img src="logo.png" alt="B">
+            </div>
+            <span class="brand-name">Bankapur stores</span>
+        </div>
+        <div class="welcome-badge" id="uName">Welcome</div>
+    </div>
+
+    <div class="action-bar">
+        <button class="menu-btn" onclick="openNav()">
+            <i class="fa-solid fa-bars-staggered"></i>
+        </button>
+    </div>
+
+    <main class="container">
+        <h2 id="pageHead">Select stores</h2>
+        
+        <div class="store-list">
+            <a href="grocery.html" class="store-card">
+                <div class="icon-container"><i class="fa-solid fa-basket-shopping"></i></div>
+                <div class="details">
+                    <b id="st1">Grocery store</b>
+                    <span id="sub1">Daily essentials & food</span>
+                </div>
+            </a>
+
+            <a href="stationery.html" class="store-card">
+                <div class="icon-container"><i class="fa-solid fa-book-bookmark"></i></div>
+                <div class="details">
+                    <b id="st2">Book stall and stationery</b>
+                    <span id="sub2">Education & office supplies</span>
+                </div>
+            </a>
+        </div>
+    </main>
+
+    <div class="side-nav" id="sideNav">
+        <div class="menu-head">
+            <i class="fa-solid fa-chevron-left back-icon" onclick="closeNav()"></i>
+            <span class="menu-title" id="setTitle">Settings</span>
+        </div>
+
+        <div class="setting-card">
+            <div class="switch-row">
+                <div class="setting-label"><i class="fa-solid fa-moon"></i> <span id="darkText">Dark Mode</span></div>
+                <label class="switch">
+                    <input type="checkbox" id="darkToggle" onchange="saveTheme()">
+                    <span class="slider"></span>
+                </label>
+            </div>
+        </div>
+
+        <div class="setting-card">
+            <div class="setting-label"><i class="fa-solid fa-language"></i> <span id="langText">Language</span></div>
+            <div class="lang-switch">
+                <button class="lang-btn" id="btn-en" onclick="setLang('en')">English</button>
+                <button class="lang-btn" id="btn-kn" onclick="setLang('kn')">ಕನ್ನಡ</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 1. Data Context
+        const user = JSON.parse(localStorage.getItem('userProfile')) || { name: "Guest" };
+
+        const translations = {
+            en: {
+                hi: "Welcome, ", title: "Select stores",
+                s1: "Grocery store", s1sub: "Daily essentials & food",
+                s2: "Book stall and stationery", s2sub: "Education & office supplies",
+                set: "Settings", dark: "Dark Mode", lang: "Language"
+            },
+            kn: {
+                hi: "ಸ್ವಾಗತ, ", title: "ಅಂಗಡಿಗಳನ್ನು ಆಯ್ಕೆಮಾಡಿ",
+                s1: "ಕಿರಾಣಿ ಅಂಗಡಿ", s1sub: "ದೈನಂದಿನ ಅಗತ್ಯ ವಸ್ತುಗಳು",
+                s2: "ಪುಸ್ತಕದ ಮಳಿಗೆ ಮತ್ತು ಲೇಖನ ಸಾಮಗ್ರಿಗಳು", s2sub: "ಶಿಕ್ಷಣ ಮತ್ತು ಕಚೇರಿ ಸಾಮಗ್ರಿಗಳು",
+                set: "ಸೆಟ್ಟಿಂಗ್‌ಗಳು", dark: "ಡಾರ್ಕ್ ಮೋಡ್", lang: "ಭಾಷೆ"
+            }
+        };
+
+        // 2. Navigation & History API
+        function openNav() {
+            document.getElementById('sideNav').classList.add('active');
+            history.pushState({ menu: 'open' }, '');
+        }
+
+        function closeNav() {
+            document.getElementById('sideNav').classList.remove('active');
+            if (history.state?.menu === 'open') history.back();
+        }
+
+        window.onpopstate = () => document.getElementById('sideNav').classList.remove('active');
+
+        // 3. Persistent Settings Logic
+        function saveTheme() {
+            const isDark = document.getElementById('darkToggle').checked;
+            document.body.classList.toggle('dark-mode', isDark);
+            localStorage.setItem('bankapur_amoled', isDark);
+        }
+
+        function setLang(lang) {
+            localStorage.setItem('bankapur_lang', lang);
+            updateUI(lang);
+        }
+
+        function updateUI(lang) {
+            const t = translations[lang];
+            // Update Text
+            document.getElementById('uName').innerText = `${t.hi}${user.name}`;
+            document.getElementById('pageHead').innerText = t.title;
+            document.getElementById('st1').innerText = t.s1;
+            document.getElementById('sub1').innerText = t.s1sub;
+            document.getElementById('st2').innerText = t.s2;
+            document.getElementById('sub2').innerText = t.s2sub;
+            document.getElementById('setTitle').innerText = t.set;
+            document.getElementById('darkText').innerText = t.dark;
+            document.getElementById('langText').innerText = t.lang;
+
+            // Update Buttons (Custom UI)
+            document.querySelectorAll('.lang-btn').forEach(btn => btn.classList.remove('active'));
+            document.getElementById(`btn-${lang}`).classList.add('active');
+        }
+
+        // 4. On Page Load (Restore Data)
+        window.onload = () => {
+            const isDark = localStorage.getItem('bankapur_amoled') === 'true';
+            document.getElementById('darkToggle').checked = isDark;
+            if(isDark) document.body.classList.add('dark-mode');
+
+            const savedLang = localStorage.getItem('bankapur_lang') || 'en';
+            updateUI(savedLang);
+        };
+    </script>
+</body>
+</html>
