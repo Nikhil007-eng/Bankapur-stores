@@ -104,11 +104,11 @@
 
         <div id="loginScreen">
             <header>
-                <h1>Initialize</h1>
-                <p>Register your session for Harapanahalli</p>
+                <h1>Bankapur stores</h1>
+                <p>Fill details to get started</p>
             </header>
 
-            <div class="group"><label>Full Name</label><input type="text" id="uName" placeholder="e.g. Nikhil"></div>
+            <div class="group"><label>Full Name</label><input type="text" id="uName" placeholder="Your name.."></div>
             <div class="group"><label>Phone Number</label><input type="tel" id="uPhone" placeholder="+91"></div>
             
             <div style="margin: 20px 0 10px 4px; font-size: 11px; font-weight: 900; color: var(--primary); letter-spacing: 1px;">DELIVERY ADDRESS</div>
@@ -119,14 +119,14 @@
             <div class="group"><label>City</label><input type="text" value="Harapanahalli" class="fixed-input" readonly tabindex="-1"></div>
 
             <button class="primary-btn" id="reqBtn" onclick="requestLogin()">
-                Request Access <i class="fa-solid fa-chevron-right"></i>
+                Login<i class="fa-solid fa-chevron-right"></i>
             </button>
         </div>
 
         <div id="otpScreen">
             <header>
                 <h1>Verification</h1>
-                <p id="otpSubText">Enter the 4-digit code sent to Nikhil</p>
+                <p id="otpSubText">Enter the 4-digit code sent to You</p>
             </header>
 
             <div class="otp-container">
@@ -143,6 +143,7 @@
             </button>
 
             <p class="status-msg">Wrong info? <b onclick="location.reload()">Go back and edit</b></p>
+            <p class="status-msg">problem with login ask developer(7019542310)</p>
         </div>
     </div>
 
