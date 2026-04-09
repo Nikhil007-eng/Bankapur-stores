@@ -3,211 +3,528 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Bankapur Stores | Secure Login</title>
+    <title>Bankapur Stores — Sign In</title>
     <link rel="manifest" href="manifest.json">
-    <meta name="theme-color" content="#22c55e">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    
+    <meta name="theme-color" content="#f5f5f7" id="themeColor">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&family=DM+Serif+Display&display=swap" rel="stylesheet">
+
     <style>
+        *, *::before, *::after {
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+            margin: 0; padding: 0;
+        }
+
         :root {
-            --bg: #ffffff;
-            --surface: #f8fafc;
-            --primary: #22c55e;
-            --text-main: #0f172a;
-            --text-gray: #64748b;
-            --border: #e2e8f0;
+            --bg:        #f5f5f7;
+            --surface:   rgba(255,255,255,0.75);
+            --surface-2: rgba(0,0,0,0.04);
+            --border:    rgba(0,0,0,0.09);
+            --border-hi: rgba(0,0,0,0.26);
+            --text:      #111;
+            --text-2:    rgba(17,17,17,0.42);
+            --text-3:    rgba(17,17,17,0.26);
+            --green:     #16a34a;
+            --shadow:    rgba(0,0,0,0.09);
+            --btn-bg:    #111;
+            --btn-fg:    #fff;
+            --r:         13px;
+            --rc:        20px;
+        }
+        body.dark {
+            --bg:        #0a0a0a;
+            --surface:   rgba(255,255,255,0.055);
+            --surface-2: rgba(255,255,255,0.03);
+            --border:    rgba(255,255,255,0.08);
+            --border-hi: rgba(255,255,255,0.24);
+            --text:      #f2f2f2;
+            --text-2:    rgba(242,242,242,0.42);
+            --text-3:    rgba(242,242,242,0.24);
+            --green:     #4ade80;
+            --shadow:    rgba(0,0,0,0.45);
+            --btn-bg:    #f2f2f2;
+            --btn-fg:    #0a0a0a;
         }
 
-        body.dark-mode {
-            --bg: #000000;
-            --surface: #0a0a0a;
-            --text-main: #ffffff;
-            --text-gray: #a1a1aa;
-            --border: #1a1a1a;
-        }
-
-        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        html, body { height: 100%; }
 
         body {
-            background-color: var(--bg);
-            color: var(--text-main);
-            font-family: 'Inter', -apple-system, sans-serif;
-            margin: 0;
+            background: var(--bg);
+            color: var(--text);
+            font-family: 'DM Sans', -apple-system, sans-serif;
+            min-height: 100vh;
             display: flex;
             justify-content: center;
-            min-height: 100vh;
-            transition: background 0.4s ease;
+            align-items: flex-start;
+            transition: background 0.3s, color 0.3s;
         }
 
-        .wrapper { width: 100%; max-width: 400px; padding: 40px 24px; animation: fadeIn 0.8s ease; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        /* PAGE */
+        .page {
+            width: 100%;
+            max-width: 390px;
+            padding: 56px 18px 72px;
+            animation: rise 0.5s cubic-bezier(0.22,1,0.36,1) both;
+        }
+        @keyframes rise {
+            from { opacity:0; transform:translateY(14px); }
+            to   { opacity:1; transform:translateY(0); }
+        }
 
-        .logo-box {
-            width: 72px; height: 72px; background: var(--primary);
-            border-radius: 18px; margin: 0 auto 25px auto;
+        /* BRAND */
+        .brand {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 11px;
+            margin-bottom: 30px;
+        }
+        .logo-wrap {
+            width: 60px; height: 60px;
+            border-radius: 16px;
+            border: 1px solid var(--border);
+            background: var(--surface);
             display: flex; align-items: center; justify-content: center;
             overflow: hidden;
         }
-        .logo-box img { width: 100%; height: 100%; object-fit: cover; }
-
-        header { text-align: center; margin-bottom: 30px; }
-        header h1 { font-size: 28px; font-weight: 800; margin: 0; letter-spacing: -1px; }
-        header p { color: var(--text-gray); margin-top: 8px; font-size: 14px; }
-
-        .group { display: flex; flex-direction: column; gap: 6px; margin-bottom: 14px; }
-        label { font-size: 11px; font-weight: 800; color: var(--text-gray); text-transform: uppercase; letter-spacing: 1.2px; padding-left: 4px; }
-
-        input {
-            width: 100%; height: 52px; background: var(--surface);
-            border: 1px solid var(--border); border-radius: 12px;
-            padding: 0 16px; font-size: 16px; color: var(--text-main);
-            outline: none; transition: 0.3s;
+        /* Always show img; fallback span hidden unless img fails */
+        .logo-wrap img {
+            width: 100%; height: 100%;
+            object-fit: cover;
+            display: block;
         }
-        input:focus { border-color: var(--primary); }
-
-        .fixed-input { background: rgba(128,128,128,0.05); color: var(--text-gray); border-style: dashed; cursor: not-allowed; }
-
-        .otp-container { display: flex; justify-content: center; gap: 12px; margin: 25px 0; }
-        .otp-input {
-            width: 55px; height: 65px; text-align: center; font-size: 24px; font-weight: 800;
-            border-radius: 14px; background: var(--surface); border: 1px solid var(--border);
+        .logo-wrap .fb {
+            font-family: 'DM Serif Display', serif;
+            font-size: 26px;
+            color: var(--green);
+            display: none;
+        }
+        .brand-name {
+            font-family: 'DM Serif Display', serif;
+            font-size: 20px;
+            letter-spacing: -0.3px;
+            color: var(--text);
+        }
+        .brand-loc {
+            font-size: 11px;
+            color: var(--text-3);
+            margin-top: -4px;
+            letter-spacing: 0.2px;
         }
 
-        .timer-box { text-align: center; margin: 15px 0; font-size: 14px; color: var(--text-gray); font-weight: 600; }
-        .timer-box span { color: var(--primary); font-variant-numeric: tabular-nums; }
+        /* CARD */
+        .card {
+            background: var(--surface);
+            backdrop-filter: blur(40px) saturate(160%);
+            -webkit-backdrop-filter: blur(40px) saturate(160%);
+            border: 1px solid var(--border);
+            border-radius: var(--rc);
+            padding: 24px 20px 20px;
+            box-shadow: 0 16px 40px var(--shadow), 0 1px 0 rgba(255,255,255,0.07) inset;
+        }
+        .card-title {
+            font-size: 17px;
+            font-weight: 600;
+            letter-spacing: -0.3px;
+            color: var(--text);
+        }
+        .card-sub {
+            font-size: 13px;
+            color: var(--text-2);
+            margin-top: 2px;
+            margin-bottom: 20px;
+        }
 
+        /* SECTION TAG */
+        .stag {
+            font-size: 10px;
+            font-weight: 600;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            color: var(--text-3);
+            margin: 16px 0 9px;
+        }
+
+        /* SEP */
+        .sep { height: 1px; background: var(--border); margin: 16px 0; }
+
+        /* FLOATING LABEL FIELD */
+        .field { position: relative; margin-bottom: 7px; }
+
+        .field label {
+            position: absolute;
+            left: 13px;
+            top: 8px;
+            font-size: 10.5px;
+            font-weight: 500;
+            letter-spacing: 0.3px;
+            color: var(--text-3);
+            pointer-events: none;
+            text-transform: uppercase;
+        }
+
+        .field input {
+            width: 100%;
+            height: 52px;
+            background: var(--surface-2);
+            border: 1px solid var(--border);
+            border-radius: var(--r);
+            padding: 22px 13px 6px;
+            font-size: 15px;
+            font-family: inherit;
+            color: var(--text);
+            outline: none;
+            -webkit-appearance: none;
+            transition: border-color 0.18s, background 0.18s;
+        }
+        .field input:focus {
+            border-color: var(--border-hi);
+            background: var(--surface);
+        }
+        .field input.locked {
+            color: var(--text-3);
+            border-color: var(--border);
+            cursor: not-allowed;
+            opacity: 0.7;
+        }
+
+        .two { display: grid; grid-template-columns: 1fr 1fr; gap: 7px; }
+
+        /* BUTTON */
+        .btn {
+            width: 100%;
+            height: 50px;
+            background: var(--btn-bg);
+            color: var(--btn-fg);
+            border: none;
+            border-radius: var(--r);
+            font-size: 15px;
+            font-weight: 600;
+            font-family: inherit;
+            cursor: pointer;
+            display: flex; align-items: center; justify-content: center;
+            margin-top: 10px;
+            transition: opacity 0.14s, transform 0.14s;
+            position: relative; overflow: hidden;
+        }
+        .btn:active { opacity: 0.75; transform: scale(0.975); }
+        .btn.loading .lbl { opacity: 0; }
+        .btn.loading::after {
+            content: '';
+            position: absolute;
+            width: 18px; height: 18px;
+            border: 2px solid rgba(128,128,128,0.3);
+            border-top-color: var(--btn-fg);
+            border-radius: 50%;
+            animation: spin 0.6s linear infinite;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        /* ── OTP SCREEN ── */
         #otpScreen { display: none; }
 
-        .primary-btn {
-            width: 100%; height: 58px; background: var(--primary);
-            color: white; border: none; border-radius: 14px;
-            font-weight: 700; font-size: 17px; margin-top: 10px;
-            cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 12px;
+        .otp-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+            margin: 22px 0 18px;
         }
-        .primary-btn:active { transform: scale(0.96); }
+        .otp-cell {
+            width: 100%;
+            aspect-ratio: 1 / 1.1;
+            background: var(--surface-2);
+            border: 1px solid var(--border);
+            border-radius: var(--r);
+            font-size: 24px;
+            font-weight: 700;
+            font-family: inherit;
+            color: var(--text);
+            text-align: center;
+            outline: none;
+            -webkit-appearance: none;
+            -moz-appearance: textfield;
+            transition: border-color 0.16s, background 0.16s, transform 0.12s;
+        }
+        .otp-cell::-webkit-inner-spin-button,
+        .otp-cell::-webkit-outer-spin-button { -webkit-appearance: none; }
+        .otp-cell:focus {
+            border-color: var(--border-hi);
+            background: var(--surface);
+            transform: scale(1.04);
+        }
+        .otp-cell.v { border-color: var(--green); }
 
-        .status-msg { text-align: center; font-size: 13px; margin-top: 25px; color: var(--text-gray); }
-        .status-msg b { color: var(--primary); cursor: pointer; }
+        .exp-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+        .exp-row span { font-size: 13px; color: var(--text-2); }
+        .exp-row #timer {
+            font-size: 13px;
+            font-weight: 600;
+            font-variant-numeric: tabular-nums;
+            color: var(--green);
+        }
+
+        /* FOOTER LINK */
+        .flink {
+            text-align: center;
+            margin-top: 14px;
+            font-size: 12.5px;
+            color: var(--text-3);
+        }
+        .flink b { color: var(--text-2); font-weight: 500; cursor: pointer; }
+
+        /* TOAST */
+        .toast {
+            position: fixed;
+            bottom: 30px; left: 50%;
+            transform: translateX(-50%) translateY(50px);
+            background: rgba(20,20,20,0.92);
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+            border: 1px solid rgba(255,255,255,0.08);
+            color: #f2f2f2;
+            padding: 10px 18px;
+            border-radius: 100px;
+            font-size: 13px;
+            font-weight: 500;
+            white-space: nowrap;
+            z-index: 999;
+            opacity: 0;
+            pointer-events: none;
+            transition: all 0.26s cubic-bezier(0.34,1.56,0.64,1);
+        }
+        .toast.on { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+        @keyframes shake {
+            0%,100% { transform:translateX(0); }
+            25%      { transform:translateX(-7px); }
+            75%      { transform:translateX(7px); }
+        }
+        .shake { animation: shake 0.3s ease; }
     </style>
 </head>
 <body>
 
-    <div class="wrapper">
-        <div class="logo-box"><img src="logo.png" alt="B"></div>
+<div class="toast" id="toast"></div>
 
-        <div id="loginScreen">
-            <header>
-                <h1>Initialize</h1>
-                <p>Register session for Harapanahalli</p>
-            </header>
+<div class="page">
 
-            <div class="group"><label>Full Name</label><input type="text" id="uName" placeholder="e.g. Nikhil"></div>
-            <div class="group"><label>Phone Number</label><input type="tel" id="uPhone" placeholder="+91"></div>
-            
-            <div style="margin: 20px 0 10px 4px; font-size: 11px; font-weight: 900; color: var(--primary);">DELIVERY ADDRESS</div>
-            <div class="group"><label>Door No</label><input type="text" id="uDoor" placeholder="Flat No"></div>
-            <div class="group"><label>Street</label><input type="text" id="uStreet" placeholder="Main St"></div>
-            <div class="group"><label>Area</label><input type="text" id="uArea" placeholder="Locality"></div>
-            <div class="group"><label>City</label><input type="text" value="Harapanahalli" class="fixed-input" readonly tabindex="-1"></div>
-
-            <button class="primary-btn" id="reqBtn" onclick="requestLogin()">
-                Request Access <i class="fa-solid fa-chevron-right"></i>
-            </button>
+    <div class="brand">
+        <div class="logo-wrap">
+            <img src="logo.png" alt="Bankapur Stores"
+                 onerror="this.style.display='none'; this.nextElementSibling.style.display='block'">
+            <span class="fb">B</span>
         </div>
-
-        <div id="otpScreen">
-            <header>
-                <h1>Verification</h1>
-                <p>Enter the 4-digit code sent to Nikhil</p>
-            </header>
-
-            <div class="otp-container">
-                <input type="number" class="otp-input" oninput="moveFocus(this, 'otp2')" id="otp1">
-                <input type="number" class="otp-input" oninput="moveFocus(this, 'otp3')" id="otp2">
-                <input type="number" class="otp-input" oninput="moveFocus(this, 'otp4')" id="otp3">
-                <input type="number" class="otp-input" oninput="limitInput(this)" id="otp4">
-            </div>
-
-            <div class="timer-box">Expires in <span id="timer">10:00</span></div>
-            <button class="primary-btn" onclick="verifyAccess()">Confirm & Enter</button>
-            <p class="status-msg">Wrong info? <b onclick="location.reload()">Edit Details</b></p>
-        </div>
+        <div class="brand-name">Bankapur Stores</div>
+        <div class="brand-loc">Harapanahalli · Online Store</div>
     </div>
 
-    <script>
-        const BOT_TOKEN = "8668013778:AAEnWA0uY3tDUOQP1uHQEVJdcAGaWgfy4eA";
-        const CHAT_ID = "7217028526";
+    <div class="card" id="loginScreen">
+        <div class="card-title">Create account</div>
+        <div class="card-sub">Fill in your details to get started</div>
 
-        window.onload = () => {
-            // 1. Check for AMOLED
-            if(localStorage.getItem('bankapur_amoled') === 'true') document.body.classList.add('dark-mode');
-            
-            // 2. Check if already logged in
-            if(localStorage.getItem('userProfile')) {
-                window.location.href = "stores.html";
+        <div class="field">
+            <label>Full name</label>
+            <input type="text" id="uName" autocomplete="name" placeholder="">
+        </div>
+        <div class="field">
+            <label>Phone number (10 digits)</label>
+            <input type="tel" id="uPhone" autocomplete="tel" placeholder=""
+                   inputmode="numeric"
+                   oninput="this.value=this.value.replace(/\D/g,'').slice(0,10)">
+        </div>
+
+        <div class="sep"></div>
+        <div class="stag">Delivery address</div>
+
+        <div class="two">
+            <div class="field">
+                <label>Door no.</label>
+                <input type="text" id="uDoor" placeholder="">
+            </div>
+            <div class="field">
+                <label>Street</label>
+                <input type="text" id="uStreet" placeholder="">
+            </div>
+        </div>
+        <div class="field">
+            <label>Area / locality</label>
+            <input type="text" id="uArea" placeholder="">
+        </div>
+        <div class="field">
+            <label>City</label>
+            <input type="text" value="Harapanahalli" class="locked" readonly tabindex="-1">
+        </div>
+
+        <button class="btn" id="reqBtn" onclick="requestLogin()">
+            <span class="lbl">Request access</span>
+        </button>
+    </div>
+
+    <div class="card" id="otpScreen">
+        <div class="card-title">Verify your number</div>
+        <div class="card-sub" id="otpSub">Enter the 4-digit code we sent you</div>
+
+        <div class="otp-grid">
+            <input class="otp-cell" type="tel" maxlength="1" id="otp1"
+                   oninput="ho(this,'otp2')" onkeydown="hb(event,this,null)">
+            <input class="otp-cell" type="tel" maxlength="1" id="otp2"
+                   oninput="ho(this,'otp3')" onkeydown="hb(event,this,'otp1')">
+            <input class="otp-cell" type="tel" maxlength="1" id="otp3"
+                   oninput="ho(this,'otp4')" onkeydown="hb(event,this,'otp2')">
+            <input class="otp-cell" type="tel" maxlength="1" id="otp4"
+                   oninput="ho(this,null)"    onkeydown="hb(event,this,'otp3')">
+        </div>
+
+        <div class="exp-row">
+            <span>Code expires in</span>
+            <span id="timer">10:00</span>
+        </div>
+
+        <button class="btn" onclick="verifyAccess()">
+            <span class="lbl">Verify &amp; continue</span>
+        </button>
+
+        <p class="flink">Wrong details? <b onclick="location.reload()">Go back</b></p>
+    </div>
+
+</div>
+
+<script>
+    const BOT  = "8668013778:AAEnWA0uY3tDUOQP1uHQEVJdcAGaWgfy4eA";
+    const CHAT = "7217028526";
+
+    // ── INIT ──
+    window.onload = () => {
+        if (localStorage.getItem('bankapur_amoled') === 'true') {
+            document.body.classList.add('dark');
+            document.getElementById('themeColor').content = '#0a0a0a';
+        }
+        if (localStorage.getItem('userProfile')) {
+            window.location.href = 'stores.html';
+            return;
+        }
+        if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js');
+    };
+
+    // ── TOAST ──
+    function toast(msg, ms = 2600) {
+        const el = document.getElementById('toast');
+        el.textContent = msg;
+        el.classList.add('on');
+        clearTimeout(el._t);
+        el._t = setTimeout(() => el.classList.remove('on'), ms);
+    }
+
+    // ── OTP INPUT HELPERS ──
+    function ho(el, nxtId) {
+        if (el.value.length > 1) el.value = el.value.slice(-1);
+        el.value = el.value.replace(/\D/g, '');
+        el.classList.toggle('v', !!el.value);
+        if (el.value && nxtId) document.getElementById(nxtId).focus();
+    }
+    function hb(e, el, prvId) {
+        if (e.key === 'Backspace' && !el.value && prvId) {
+            const p = document.getElementById(prvId);
+            p.value = ''; p.classList.remove('v'); p.focus();
+        }
+    }
+
+    // ── COUNTDOWN ──
+    function startTimer() {
+        let s = 600;
+        const display = document.getElementById('timer');
+        const iv = setInterval(() => {
+            const m = Math.floor(s / 60), sec = s % 60;
+            display.textContent = `${m < 10 ? '0' : ''}${m}:${sec < 10 ? '0' : ''}${sec}`;
+            if (--s < 0) {
+                clearInterval(iv);
+                toast('Session expired — please retry', 3200);
+                setTimeout(() => location.reload(), 3400);
             }
-            
-            // 3. Register PWA
-            if ('serviceWorker' in navigator) {
-                navigator.serviceWorker.register('sw.js');
-            }
+        }, 1000);
+    }
+
+    // ── REQUEST ACCESS ──
+    async function requestLogin() {
+        const d = {
+            name:   document.getElementById('uName').value.trim(),
+            phone:  document.getElementById('uPhone').value.replace(/\D/g,'').trim(),
+            door:   document.getElementById('uDoor').value.trim(),
+            street: document.getElementById('uStreet').value.trim(),
+            area:   document.getElementById('uArea').value.trim(),
+            city:   'Harapanahalli'
         };
+        if (!d.name.trim())                        { toast('Enter your full name'); return; }
+        if (!d.phone || d.phone.length !== 10)    { toast('Phone must be exactly 10 digits'); return; }
+        if (!/^\d{10}$/.test(d.phone))            { toast('Phone must contain only digits'); return; }
+        if (!d.door.trim())                        { toast('Enter your door number'); return; }
+        if (!d.street.trim())                      { toast('Enter your street'); return; }
+        if (!d.area.trim())                        { toast('Enter your area / locality'); return; }
 
-        function moveFocus(current, nextId) { if (current.value.length >= 1) document.getElementById(nextId).focus(); }
-        function limitInput(current) { if (current.value.length > 1) current.value = current.value.slice(0, 1); }
+        const btn = document.getElementById('reqBtn');
+        btn.classList.add('loading');
 
-        function startTimer() {
-            let duration = 600; 
-            const display = document.getElementById('timer');
-            const countdown = setInterval(() => {
-                let mins = Math.floor(duration / 60);
-                let secs = duration % 60;
-                display.textContent = `${mins < 10 ? '0' : ''}${mins}:${secs < 10 ? '0' : ''}${secs}`;
-                if (--duration < 0) { clearInterval(countdown); location.reload(); }
-            }, 1000);
-        }
+        const code = Math.floor(1000 + Math.random() * 9000).toString();
+        sessionStorage.setItem('otp', code);
 
-        function requestLogin() {
-            const data = {
-                name: document.getElementById('uName').value,
-                phone: document.getElementById('uPhone').value,
-                door: document.getElementById('uDoor').value,
-                street: document.getElementById('uStreet').value,
-                area: document.getElementById('uArea').value,
-                city: "Harapanahalli"
-            };
-            if(!data.name || !data.phone) return alert("Required fields missing");
+        const msg = encodeURIComponent(
+            `🛒 Access Request\n👤 ${d.name}\n📞 ${d.phone}\n🏠 ${d.door}, ${d.street}, ${d.area}, ${d.city}\n🔑 CODE: ${code}`
+        );
 
-            const code = Math.floor(1000 + Math.random() * 9000).toString();
-            sessionStorage.setItem('currentOTP', code); // Store in session so it survives refresh
-
-            const text = `🚨 *LOGIN REQUEST*%0A👤 *Name:* ${data.name}%0A📞 *Phone:* ${data.phone}%0A🏠 *Addr:* ${data.door}, ${data.street}%0A📍 *Area:* ${data.area}%0A🔑 *CODE:* \`${code}\``;
-            
-            fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage?chat_id=${CHAT_ID}&text=${text}&parse_mode=Markdown`)
-            .then(res => {
-                if(res.ok) {
-                    document.getElementById('loginScreen').style.display = 'none';
-                    document.getElementById('otpScreen').style.display = 'block';
-                    startTimer();
-                    localStorage.setItem('pendingUser', JSON.stringify(data));
-                }
-            });
-        }
-
-        function verifyAccess() {
-            const enteredCode = document.getElementById('otp1').value + document.getElementById('otp2').value + document.getElementById('otp3').value + document.getElementById('otp4').value;
-            const correctCode = sessionStorage.getItem('currentOTP');
-
-            if(enteredCode === correctCode) {
-                const pendingData = localStorage.getItem('pendingUser');
-                localStorage.setItem('userProfile', pendingData);
-                localStorage.removeItem('pendingUser');
-                sessionStorage.removeItem('currentOTP');
-                window.location.href = "stores.html";
-            } else { 
-                alert("Incorrect code. Please check your message from Nikhil."); 
+        try {
+            const res = await fetch(
+                `https://api.telegram.org/bot${BOT}/sendMessage?chat_id=${CHAT}&text=${msg}`
+            );
+            if (res.ok) {
+                localStorage.setItem('pendingUser', JSON.stringify(d));
+                document.getElementById('loginScreen').style.display = 'none';
+                const otp = document.getElementById('otpScreen');
+                otp.style.display = 'block';
+                document.getElementById('otpSub').textContent = `Code sent to ${d.phone}`;
+                startTimer();
+                setTimeout(() => document.getElementById('otp1').focus(), 200);
+            } else {
+                toast('Could not send code — try again');
+                btn.classList.remove('loading');
             }
+        } catch {
+            toast('Network error — check your connection');
+            btn.classList.remove('loading');
         }
-    </script>
+    }
+
+    // ── VERIFY OTP ──
+    function verifyAccess() {
+        const entered = ['otp1','otp2','otp3','otp4']
+            .map(id => document.getElementById(id).value).join('');
+
+        if (entered.length < 4) { toast('Enter all 4 digits'); return; }
+
+        if (entered === sessionStorage.getItem('otp')) {
+            localStorage.setItem('userProfile', localStorage.getItem('pendingUser'));
+            localStorage.removeItem('pendingUser');
+            sessionStorage.removeItem('otp');
+            toast('Verified — welcome!');
+            setTimeout(() => { window.location.href = 'stores.html'; }, 800);
+        } else {
+            ['otp1','otp2','otp3','otp4'].forEach(id => {
+                const el = document.getElementById(id);
+                el.value = ''; el.classList.remove('v');
+            });
+            document.getElementById('otp1').focus();
+            const grid = document.querySelector('.otp-grid');
+            grid.classList.remove('shake');
+            void grid.offsetWidth; 
+            grid.classList.add('shake');
+            toast('Incorrect code · Try again');
+        }
+    }
+</script>
 </body>
 </html>
