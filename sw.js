@@ -1,5 +1,6 @@
 const CACHE_NAME = 'bankapur-v1';
 const ASSETS = [
+  '/',
   'index.html',
   'manifest.json',
   'logo.png'
@@ -14,11 +15,22 @@ self.addEventListener('install', (e) => {
   );
 });
 
-// Fetch Assets
+// Activate & Clean up old caches
+self.addEventListener('activate', (e) => {
+  e.waitUntil(
+    caches.keys().then((keys) => {
+      return Promise.all(
+        keys.filter(key => key !== CACHE_NAME).map(key => caches.delete(key))
+      );
+    })
+  );
+});
+
+// Fetch Strategy: Network First, falling back to Cache
 self.addEventListener('fetch', (e) => {
   e.respondWith(
-    caches.match(e.request).then((response) => {
-      return response || fetch(e.request);
+    fetch(e.request).catch(() => {
+      return caches.match(e.request);
     })
   );
 });
