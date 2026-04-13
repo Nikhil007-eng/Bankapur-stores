@@ -88,7 +88,6 @@
             display: flex; align-items: center; justify-content: center;
             overflow: hidden;
         }
-        /* Always show img; fallback span hidden unless img fails */
         .logo-wrap img {
             width: 100%; height: 100%;
             object-fit: cover;
@@ -221,7 +220,7 @@
         }
         @keyframes spin { to { transform: rotate(360deg); } }
 
-        /* ── OTP SCREEN ── */
+        /* OTP SCREEN */
         #otpScreen { display: none; }
 
         .otp-grid {
@@ -390,7 +389,7 @@
             <span class="lbl">Verify &amp; continue</span>
         </button>
 
-        <p class="flink">Wrong details? <b onclick="location.reload()">Go back</b></p>
+        <p class="flink">Wrong details? <b onclick="clearAndReload()">Go back</b></p>
     </div>
 
 </div>
@@ -399,16 +398,57 @@
     const BOT  = "8668013778:AAEnWA0uY3tDUOQP1uHQEVJdcAGaWgfy4eA";
     const CHAT = "7217028526";
 
+    // ── PERSISTENT STORAGE HELPERS ──
+    // All critical data goes to localStorage only — never sessionStorage.
+    // localStorage persists until the user explicitly clears site data or uninstalls the PWA.
+    function saveData(key, value) {
+        try { localStorage.setItem(key, value); } catch(e) {}
+    }
+    function loadData(key) {
+        try { return localStorage.getItem(key); } catch(e) { return null; }
+    }
+    function removeData(key) {
+        try { localStorage.removeItem(key); } catch(e) {}
+    }
+
     // ── INIT ──
     window.onload = () => {
-        if (localStorage.getItem('bankapur_amoled') === 'true') {
+        // Apply saved theme
+        if (loadData('bankapur_amoled') === 'true') {
             document.body.classList.add('dark');
             document.getElementById('themeColor').content = '#0a0a0a';
         }
-        if (localStorage.getItem('userProfile')) {
+
+        // Already verified — go straight to store
+        if (loadData('userProfile')) {
             window.location.href = 'stores.html';
             return;
         }
+
+        // Mid-flow: user closed app during OTP step — resume if OTP still valid
+        const pending   = loadData('pendingUser');
+        const savedOtp  = loadData('otp_code');
+        const otpExpiry = loadData('otp_expiry');
+        if (pending && savedOtp && otpExpiry && Date.now() < parseInt(otpExpiry)) {
+            const d = JSON.parse(pending);
+            document.getElementById('loginScreen').style.display = 'none';
+            document.getElementById('otpScreen').style.display  = 'block';
+            document.getElementById('otpSub').textContent = `Code sent to ${d.phone}`;
+            // Resume countdown with actual remaining time
+            const remaining = Math.floor((parseInt(otpExpiry) - Date.now()) / 1000);
+            startTimer(remaining);
+            setTimeout(() => document.getElementById('otp1').focus(), 200);
+            return;
+        }
+
+        // Stale pending state (OTP expired) — clean up so user gets fresh form
+        if (pending) {
+            removeData('pendingUser');
+            removeData('otp_code');
+            removeData('otp_expiry');
+        }
+
+        // Register service worker
         if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js');
     };
 
@@ -436,14 +476,19 @@
     }
 
     // ── COUNTDOWN ──
-    function startTimer() {
-        let s = 600;
+    // Accepts seconds param so mid-session resume works correctly
+    function startTimer(seconds = 600) {
+        let s = seconds;
         const display = document.getElementById('timer');
         const iv = setInterval(() => {
-            const m = Math.floor(s / 60), sec = s % 60;
+            const m   = Math.floor(s / 60);
+            const sec = s % 60;
             display.textContent = `${m < 10 ? '0' : ''}${m}:${sec < 10 ? '0' : ''}${sec}`;
             if (--s < 0) {
                 clearInterval(iv);
+                removeData('otp_code');
+                removeData('otp_expiry');
+                removeData('pendingUser');
                 toast('Session expired — please retry', 3200);
                 setTimeout(() => location.reload(), 3400);
             }
@@ -460,18 +505,21 @@
             area:   document.getElementById('uArea').value.trim(),
             city:   'Harapanahalli'
         };
-        if (!d.name.trim())                        { toast('Enter your full name'); return; }
-        if (!d.phone || d.phone.length !== 10)    { toast('Phone must be exactly 10 digits'); return; }
-        if (!/^\d{10}$/.test(d.phone))            { toast('Phone must contain only digits'); return; }
-        if (!d.door.trim())                        { toast('Enter your door number'); return; }
-        if (!d.street.trim())                      { toast('Enter your street'); return; }
-        if (!d.area.trim())                        { toast('Enter your area / locality'); return; }
+        if (!d.name)                            { toast('Enter your full name'); return; }
+        if (!d.phone || d.phone.length !== 10)  { toast('Phone must be exactly 10 digits'); return; }
+        if (!/^\d{10}$/.test(d.phone))          { toast('Phone must contain only digits'); return; }
+        if (!d.door)                            { toast('Enter your door number'); return; }
+        if (!d.street)                          { toast('Enter your street'); return; }
+        if (!d.area)                            { toast('Enter your area / locality'); return; }
 
         const btn = document.getElementById('reqBtn');
         btn.classList.add('loading');
 
         const code = Math.floor(1000 + Math.random() * 9000).toString();
-        sessionStorage.setItem('otp', code);
+
+        // Store OTP + expiry in localStorage (survives PWA close/reopen, unlike sessionStorage)
+        saveData('otp_code',   code);
+        saveData('otp_expiry', (Date.now() + 600000).toString()); // 10 min expiry
 
         const msg = encodeURIComponent(
             `🛒 Access Request\n👤 ${d.name}\n📞 ${d.phone}\n🏠 ${d.door}, ${d.street}, ${d.area}, ${d.city}\n🔑 CODE: ${code}`
@@ -482,10 +530,9 @@
                 `https://api.telegram.org/bot${BOT}/sendMessage?chat_id=${CHAT}&text=${msg}`
             );
             if (res.ok) {
-                localStorage.setItem('pendingUser', JSON.stringify(d));
+                saveData('pendingUser', JSON.stringify(d));
                 document.getElementById('loginScreen').style.display = 'none';
-                const otp = document.getElementById('otpScreen');
-                otp.style.display = 'block';
+                document.getElementById('otpScreen').style.display   = 'block';
                 document.getElementById('otpSub').textContent = `Code sent to ${d.phone}`;
                 startTimer();
                 setTimeout(() => document.getElementById('otp1').focus(), 200);
@@ -506,10 +553,12 @@
 
         if (entered.length < 4) { toast('Enter all 4 digits'); return; }
 
-        if (entered === sessionStorage.getItem('otp')) {
-            localStorage.setItem('userProfile', localStorage.getItem('pendingUser'));
-            localStorage.removeItem('pendingUser');
-            sessionStorage.removeItem('otp');
+        if (entered === loadData('otp_code')) {
+            // Write profile permanently, then clean up temp auth keys
+            saveData('userProfile', loadData('pendingUser'));
+            removeData('pendingUser');
+            removeData('otp_code');
+            removeData('otp_expiry');
             toast('Verified — welcome!');
             setTimeout(() => { window.location.href = 'stores.html'; }, 800);
         } else {
@@ -520,10 +569,18 @@
             document.getElementById('otp1').focus();
             const grid = document.querySelector('.otp-grid');
             grid.classList.remove('shake');
-            void grid.offsetWidth; 
+            void grid.offsetWidth;
             grid.classList.add('shake');
             toast('Incorrect code · Try again');
         }
+    }
+
+    // ── GO BACK (clear stale auth state cleanly) ──
+    function clearAndReload() {
+        removeData('pendingUser');
+        removeData('otp_code');
+        removeData('otp_expiry');
+        location.reload();
     }
 </script>
 </body>
