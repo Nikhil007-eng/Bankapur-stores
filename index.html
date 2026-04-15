@@ -60,6 +60,9 @@
             transition: background 0.3s, color 0.3s;
         }
 
+        /* BLANK PAGE for domain lock */
+        #blocked { display: none; }
+
         /* PAGE */
         .page {
             width: 100%;
@@ -78,7 +81,7 @@
             flex-direction: column;
             align-items: center;
             gap: 11px;
-            margin-bottom: 30px;
+            margin-bottom: 20px;
         }
         .logo-wrap {
             width: 60px; height: 60px;
@@ -111,6 +114,44 @@
             margin-top: -4px;
             letter-spacing: 0.2px;
         }
+
+        /* TOGGLE */
+        .auth-toggle {
+            display: flex;
+            background: var(--surface-2);
+            border: 1px solid var(--border);
+            border-radius: 100px;
+            padding: 3px;
+            margin-bottom: 18px;
+            position: relative;
+        }
+        .auth-toggle .slider {
+            position: absolute;
+            top: 3px; left: 3px;
+            width: calc(50% - 3px);
+            height: calc(100% - 6px);
+            background: var(--btn-bg);
+            border-radius: 100px;
+            transition: transform 0.28s cubic-bezier(0.34,1.2,0.64,1);
+            z-index: 0;
+        }
+        .auth-toggle.signin .slider { transform: translateX(100%); }
+        .auth-toggle button {
+            flex: 1;
+            height: 36px;
+            border: none;
+            background: transparent;
+            border-radius: 100px;
+            font-size: 13.5px;
+            font-weight: 600;
+            font-family: inherit;
+            cursor: pointer;
+            position: relative;
+            z-index: 1;
+            transition: color 0.2s;
+            color: var(--text-2);
+        }
+        .auth-toggle button.active { color: var(--btn-fg); }
 
         /* CARD */
         .card {
@@ -150,11 +191,9 @@
 
         /* FLOATING LABEL FIELD */
         .field { position: relative; margin-bottom: 7px; }
-
         .field label {
             position: absolute;
-            left: 13px;
-            top: 8px;
+            left: 13px; top: 8px;
             font-size: 10.5px;
             font-weight: 500;
             letter-spacing: 0.3px;
@@ -162,7 +201,6 @@
             pointer-events: none;
             text-transform: uppercase;
         }
-
         .field input {
             width: 100%;
             height: 52px;
@@ -220,8 +258,48 @@
         }
         @keyframes spin { to { transform: rotate(360deg); } }
 
+        /* FORGOT PASSWORD LINK */
+        .forgot-link {
+            text-align: center;
+            margin-top: 12px;
+            font-size: 12.5px;
+            color: var(--text-3);
+            cursor: pointer;
+        }
+        .forgot-link span { color: var(--text-2); font-weight: 500; }
+
+        /* ID DISPLAY BOX */
+        .id-box {
+            background: var(--surface-2);
+            border: 1px solid var(--border);
+            border-radius: var(--r);
+            padding: 14px 16px;
+            margin-bottom: 14px;
+            text-align: center;
+        }
+        .id-box .id-label {
+            font-size: 10.5px;
+            font-weight: 600;
+            letter-spacing: 1.2px;
+            text-transform: uppercase;
+            color: var(--text-3);
+            margin-bottom: 4px;
+        }
+        .id-box .id-val {
+            font-size: 28px;
+            font-weight: 700;
+            letter-spacing: 6px;
+            color: var(--green);
+            font-variant-numeric: tabular-nums;
+        }
+        .id-box .id-note {
+            font-size: 11.5px;
+            color: var(--text-3);
+            margin-top: 4px;
+        }
+
         /* OTP SCREEN */
-        #otpScreen { display: none; }
+        #otpScreen, #setPasswordScreen, #forgotScreen { display: none; }
 
         .otp-grid {
             display: grid;
@@ -277,6 +355,65 @@
         }
         .flink b { color: var(--text-2); font-weight: 500; cursor: pointer; }
 
+        /* FORGOT SCREEN */
+        .contact-card {
+            text-align: center;
+            padding: 10px 0;
+        }
+        .contact-icon {
+            width: 56px; height: 56px;
+            border-radius: 50%;
+            background: var(--surface-2);
+            border: 1px solid var(--border);
+            display: flex; align-items: center; justify-content: center;
+            margin: 0 auto 14px;
+            font-size: 22px;
+        }
+        .contact-email {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text);
+            margin-bottom: 4px;
+        }
+        .contact-phone {
+            font-size: 13px;
+            color: var(--text-2);
+            margin-bottom: 18px;
+        }
+        .btn-outline {
+            width: 100%;
+            height: 46px;
+            background: transparent;
+            color: var(--text);
+            border: 1px solid var(--border-hi);
+            border-radius: var(--r);
+            font-size: 14px;
+            font-weight: 600;
+            font-family: inherit;
+            cursor: pointer;
+            display: flex; align-items: center; justify-content: center;
+            gap: 8px;
+            margin-bottom: 8px;
+            transition: opacity 0.14s, transform 0.14s;
+        }
+        .btn-outline:active { opacity: 0.7; transform: scale(0.975); }
+
+        /* BACK BUTTON */
+        .back-btn {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--text-2);
+            cursor: pointer;
+            margin-bottom: 16px;
+            padding: 4px 0;
+            width: fit-content;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .back-btn svg { width: 16px; height: 16px; }
+
         /* TOAST */
         .toast {
             position: fixed;
@@ -305,12 +442,18 @@
             75%      { transform:translateX(7px); }
         }
         .shake { animation: shake 0.3s ease; }
+
+        /* screens hidden by default */
+        .screen { display: none; }
+        #signupScreen { display: block; }
     </style>
 </head>
 <body>
 
 <div class="toast" id="toast"></div>
 
+<!-- DOMAIN LOCK: if not on GitHub Pages, body stays blank -->
+<div id="appRoot" style="display:none;">
 <div class="page">
 
     <div class="brand">
@@ -323,265 +466,693 @@
         <div class="brand-loc">Harapanahalli · Online Store</div>
     </div>
 
-    <div class="card" id="loginScreen">
-        <div class="card-title">Create account</div>
-        <div class="card-sub">Fill in your details to get started</div>
-
-        <div class="field">
-            <label>Full name</label>
-            <input type="text" id="uName" autocomplete="name" placeholder="">
-        </div>
-        <div class="field">
-            <label>Phone number (10 digits)</label>
-            <input type="tel" id="uPhone" autocomplete="tel" placeholder=""
-                   inputmode="numeric"
-                   oninput="this.value=this.value.replace(/\D/g,'').slice(0,10)">
-        </div>
-
-        <div class="sep"></div>
-        <div class="stag">Delivery address</div>
-
-        <div class="two">
-            <div class="field">
-                <label>Door no.</label>
-                <input type="text" id="uDoor" placeholder="">
-            </div>
-            <div class="field">
-                <label>Street</label>
-                <input type="text" id="uStreet" placeholder="">
-            </div>
-        </div>
-        <div class="field">
-            <label>Area / locality</label>
-            <input type="text" id="uArea" placeholder="">
-        </div>
-        <div class="field">
-            <label>City</label>
-            <input type="text" value="Harapanahalli" class="locked" readonly tabindex="-1">
-        </div>
-
-        <button class="btn" id="reqBtn" onclick="requestLogin()">
-            <span class="lbl">Request access</span>
-        </button>
+    <!-- TOGGLE: shown on signup/signin screens -->
+    <div class="auth-toggle" id="authToggle">
+        <div class="slider"></div>
+        <button class="active" onclick="switchTab('signup')">Sign Up</button>
+        <button onclick="switchTab('signin')">Sign In</button>
     </div>
 
-    <div class="card" id="otpScreen">
-        <div class="card-title">Verify your number</div>
-        <div class="card-sub" id="otpSub">Enter the 4-digit code we sent you</div>
+    <!-- ══════════════════════════════════════
+         SCREEN 1: SIGN UP
+    ══════════════════════════════════════ -->
+    <div id="signupScreen" class="screen" style="display:block;">
+        <div class="card">
+            <div class="card-title">Create account</div>
+            <div class="card-sub">Fill in your details to get started</div>
 
-        <div class="otp-grid">
-            <input class="otp-cell" type="tel" maxlength="1" id="otp1"
-                   oninput="ho(this,'otp2')" onkeydown="hb(event,this,null)">
-            <input class="otp-cell" type="tel" maxlength="1" id="otp2"
-                   oninput="ho(this,'otp3')" onkeydown="hb(event,this,'otp1')">
-            <input class="otp-cell" type="tel" maxlength="1" id="otp3"
-                   oninput="ho(this,'otp4')" onkeydown="hb(event,this,'otp2')">
-            <input class="otp-cell" type="tel" maxlength="1" id="otp4"
-                   oninput="ho(this,null)"    onkeydown="hb(event,this,'otp3')">
+            <div class="field">
+                <label>Full name</label>
+                <input type="text" id="uName" autocomplete="name" placeholder="">
+            </div>
+            <div class="field">
+                <label>Phone number (10 digits)</label>
+                <input type="tel" id="uPhone" autocomplete="tel" placeholder=""
+                       inputmode="numeric"
+                       oninput="this.value=this.value.replace(/\D/g,'').slice(0,10)">
+            </div>
+
+            <div class="sep"></div>
+            <div class="stag">Delivery address</div>
+
+            <div class="two">
+                <div class="field">
+                    <label>Door no.</label>
+                    <input type="text" id="uDoor" placeholder="">
+                </div>
+                <div class="field">
+                    <label>Street</label>
+                    <input type="text" id="uStreet" placeholder="">
+                </div>
+            </div>
+            <div class="field">
+                <label>Area / locality</label>
+                <input type="text" id="uArea" placeholder="">
+            </div>
+            <div class="field">
+                <label>City</label>
+                <input type="text" value="Harapanahalli" class="locked" readonly tabindex="-1">
+            </div>
+
+            <button class="btn" id="reqBtn" onclick="requestLogin()">
+                <span class="lbl">Request access</span>
+            </button>
         </div>
-
-        <div class="exp-row">
-            <span>Code expires in</span>
-            <span id="timer">10:00</span>
-        </div>
-
-        <button class="btn" onclick="verifyAccess()">
-            <span class="lbl">Verify &amp; continue</span>
-        </button>
-
-        <p class="flink">Wrong details? <b onclick="clearAndReload()">Go back</b></p>
     </div>
 
-</div>
+    <!-- ══════════════════════════════════════
+         SCREEN 2: SIGN IN
+    ══════════════════════════════════════ -->
+    <div id="signinScreen" class="screen">
+        <div class="card">
+            <div class="card-title">Welcome back</div>
+            <div class="card-sub">Sign in with your phone or ID</div>
+
+            <div class="field">
+                <label>Phone number or 6-digit ID</label>
+                <input type="text" id="siIdentifier" inputmode="numeric" placeholder=""
+                       oninput="this.value=this.value.replace(/\D/g,'').slice(0,10)">
+            </div>
+            <div class="field">
+                <label>Password</label>
+                <input type="password" id="siPassword" placeholder="">
+            </div>
+
+            <button class="btn" id="siBtn" onclick="doSignIn()">
+                <span class="lbl">Sign in</span>
+            </button>
+
+            <div class="forgot-link" onclick="showForgot()">
+                Trouble signing in? <span>Contact support</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- ══════════════════════════════════════
+         SCREEN 3: OTP VERIFY
+    ══════════════════════════════════════ -->
+    <div id="otpScreen" class="screen">
+        <div class="card">
+            <div class="back-btn" onclick="goBack()">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="15 18 9 12 15 6"></polyline>
+                </svg>
+                Back
+            </div>
+            <div class="card-title">Verify your number</div>
+            <div class="card-sub" id="otpSub">Enter the 4-digit code we sent you</div>
+
+            <div class="otp-grid">
+                <input class="otp-cell" type="tel" maxlength="1" id="otp1"
+                       oninput="ho(this,'otp2')" onkeydown="hb(event,this,null)">
+                <input class="otp-cell" type="tel" maxlength="1" id="otp2"
+                       oninput="ho(this,'otp3')" onkeydown="hb(event,this,'otp1')">
+                <input class="otp-cell" type="tel" maxlength="1" id="otp3"
+                       oninput="ho(this,'otp4')" onkeydown="hb(event,this,'otp2')">
+                <input class="otp-cell" type="tel" maxlength="1" id="otp4"
+                       oninput="ho(this,null)"    onkeydown="hb(event,this,'otp3')">
+            </div>
+
+            <div class="exp-row">
+                <span>Code expires in</span>
+                <span id="timer">10:00</span>
+            </div>
+
+            <button class="btn" onclick="verifyAccess()">
+                <span class="lbl">Verify &amp; continue</span>
+            </button>
+
+            <p class="flink">Wrong details? <b onclick="clearAndReload()">Start over</b></p>
+        </div>
+    </div>
+
+    <!-- ══════════════════════════════════════
+         SCREEN 4: SET PASSWORD
+    ══════════════════════════════════════ -->
+    <div id="setPasswordScreen" class="screen">
+        <div class="card">
+            <div class="card-title">Set your password</div>
+            <div class="card-sub">Choose a password to access the store</div>
+
+            <!-- Show assigned ID -->
+            <div class="id-box">
+                <div class="id-label">Your Account ID</div>
+                <div class="id-val" id="displayId">——</div>
+                <div class="id-note">Save this — use it to sign in from any device</div>
+            </div>
+
+            <div class="field">
+                <label>New password</label>
+                <input type="password" id="newPass" placeholder="">
+            </div>
+            <div class="field">
+                <label>Confirm password</label>
+                <input type="password" id="confirmPass" placeholder="">
+            </div>
+
+            <button class="btn" id="setPassBtn" onclick="setPassword()">
+                <span class="lbl">Save &amp; enter store</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- ══════════════════════════════════════
+         SCREEN 5: FORGOT / CONTACT
+    ══════════════════════════════════════ -->
+    <div id="forgotScreen" class="screen">
+        <div class="card">
+            <div class="back-btn" onclick="goBack()">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="15 18 9 12 15 6"></polyline>
+                </svg>
+                Back
+            </div>
+            <div class="card-title">Need help?</div>
+            <div class="card-sub">Contact the developer to recover your account</div>
+
+            <div class="contact-card">
+                <div class="contact-icon">✉️</div>
+                <div class="contact-email">nikhilb07@zohomail.in</div>
+                <div class="contact-phone">+91 70195 42310</div>
+
+                <a href="mailto:nikhilb07@zohomail.in?subject=Account%20Recovery%20-%20Bankapur%20Stores&body=Hi%2C%20I%20need%20help%20recovering%20my%20account.%0A%0AName%3A%20%0APhone%3A%20" style="text-decoration:none;">
+                    <button class="btn-outline">
+                        <span>✉️</span> Send email
+                    </button>
+                </a>
+                <a href="tel:+917019542310" style="text-decoration:none;">
+                    <button class="btn-outline">
+                        <span>📞</span> Call developer
+                    </button>
+                </a>
+            </div>
+        </div>
+    </div>
+
+</div><!-- .page -->
+</div><!-- #appRoot -->
 
 <script>
-    const BOT  = "8668013778:AAEnWA0uY3tDUOQP1uHQEVJdcAGaWgfy4eA";
-    const CHAT = "7217028526";
-
-    // ── PERSISTENT STORAGE HELPERS ──
-    // All critical data goes to localStorage only — never sessionStorage.
-    // localStorage persists until the user explicitly clears site data or uninstalls the PWA.
-    function saveData(key, value) {
-        try { localStorage.setItem(key, value); } catch(e) {}
+// ══════════════════════════════════════════════════════════
+// DOMAIN LOCK — only runs on nikhil007-eng.github.io
+// ══════════════════════════════════════════════════════════
+(function() {
+    const host = location.hostname;
+    if (host !== 'nikhil007-eng.github.io' && host !== 'localhost') {
+        // Show blank page — no content rendered
+        document.documentElement.style.background = '#fff';
+        document.body.style.display = 'none';
+        return;
     }
-    function loadData(key) {
-        try { return localStorage.getItem(key); } catch(e) { return null; }
-    }
-    function removeData(key) {
-        try { localStorage.removeItem(key); } catch(e) {}
-    }
+    document.getElementById('appRoot').style.display = 'block';
+})();
 
-    // ── INIT ──
-    window.onload = () => {
-        // Apply saved theme
-        if (loadData('bankapur_amoled') === 'true') {
-            document.body.classList.add('dark');
-            document.getElementById('themeColor').content = '#0a0a0a';
-        }
+// ══════════════════════════════════════════════════════════
+// PHONE ↔ ENCODED CIPHER
+// 1234567890 → X A Y G T U Z N B E
+// ══════════════════════════════════════════════════════════
+const CIPHER_FWD = { '1':'X','2':'A','3':'Y','4':'G','5':'T','6':'U','7':'Z','8':'N','9':'B','0':'E' };
+const CIPHER_REV = { 'X':'1','A':'2','Y':'3','G':'4','T':'5','U':'6','Z':'7','N':'8','B':'9','E':'0' };
 
-        // Already verified — go straight to store
-        if (loadData('userProfile')) {
-            window.location.href = 'stores.html';
-            return;
-        }
+function encodePhone(phone) {
+    return phone.split('').map(c => CIPHER_FWD[c] || c).join('');
+}
+function decodePhone(enc) {
+    return enc.toUpperCase().split('').map(c => CIPHER_REV[c] || c).join('');
+}
 
-        // Mid-flow: user closed app during OTP step — resume if OTP still valid
-        const pending   = loadData('pendingUser');
-        const savedOtp  = loadData('otp_code');
-        const otpExpiry = loadData('otp_expiry');
-        if (pending && savedOtp && otpExpiry && Date.now() < parseInt(otpExpiry)) {
-            const d = JSON.parse(pending);
-            document.getElementById('loginScreen').style.display = 'none';
-            document.getElementById('otpScreen').style.display  = 'block';
-            document.getElementById('otpSub').textContent = `Code sent to ${d.phone}`;
-            // Resume countdown with actual remaining time
-            const remaining = Math.floor((parseInt(otpExpiry) - Date.now()) / 1000);
-            startTimer(remaining);
-            setTimeout(() => document.getElementById('otp1').focus(), 200);
-            return;
-        }
+// Encode user ID (6-digit number) same cipher
+function encodeId(id) {
+    return id.toString().split('').map(c => CIPHER_FWD[c] || c).join('');
+}
 
-        // Stale pending state (OTP expired) — clean up so user gets fresh form
-        if (pending) {
-            removeData('pendingUser');
-            removeData('otp_code');
-            removeData('otp_expiry');
-        }
+// ══════════════════════════════════════════════════════════
+// TELEGRAM
+// ══════════════════════════════════════════════════════════
+const BOT  = "8668013778:AAEnWA0uY3tDUOQP1uHQEVJdcAGaWgfy4eA";
+const CHAT = "7217028526";
 
-        // Register service worker
-        if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js');
-    };
+// ══════════════════════════════════════════════════════════
+// STORAGE HELPERS
+// ══════════════════════════════════════════════════════════
+function saveData(key, value) { try { localStorage.setItem(key, value); } catch(e) {} }
+function loadData(key) { try { return localStorage.getItem(key); } catch(e) { return null; } }
+function removeData(key) { try { localStorage.removeItem(key); } catch(e) {} }
 
-    // ── TOAST ──
-    function toast(msg, ms = 2600) {
-        const el = document.getElementById('toast');
-        el.textContent = msg;
-        el.classList.add('on');
-        clearTimeout(el._t);
-        el._t = setTimeout(() => el.classList.remove('on'), ms);
-    }
+// ══════════════════════════════════════════════════════════
+// HISTORY / SCREEN STATE
+// ══════════════════════════════════════════════════════════
+// Tracks which screen is currently showing for back navigation
+let currentScreen = 'signup';
 
-    // ── OTP INPUT HELPERS ──
-    function ho(el, nxtId) {
-        if (el.value.length > 1) el.value = el.value.slice(-1);
-        el.value = el.value.replace(/\D/g, '');
-        el.classList.toggle('v', !!el.value);
-        if (el.value && nxtId) document.getElementById(nxtId).focus();
-    }
-    function hb(e, el, prvId) {
-        if (e.key === 'Backspace' && !el.value && prvId) {
-            const p = document.getElementById(prvId);
-            p.value = ''; p.classList.remove('v'); p.focus();
-        }
+function showScreen(id) {
+    // Hide all screens and toggle
+    document.querySelectorAll('.screen').forEach(s => s.style.display = 'none');
+    document.getElementById('authToggle').style.display = 'none';
+
+    document.getElementById(id).style.display = 'block';
+    currentScreen = id;
+
+    // Show toggle only on signup/signin
+    if (id === 'signupScreen' || id === 'signinScreen') {
+        document.getElementById('authToggle').style.display = 'flex';
     }
 
-    // ── COUNTDOWN ──
-    // Accepts seconds param so mid-session resume works correctly
-    function startTimer(seconds = 600) {
-        let s = seconds;
-        const display = document.getElementById('timer');
-        const iv = setInterval(() => {
-            const m   = Math.floor(s / 60);
-            const sec = s % 60;
-            display.textContent = `${m < 10 ? '0' : ''}${m}:${sec < 10 ? '0' : ''}${sec}`;
-            if (--s < 0) {
-                clearInterval(iv);
-                removeData('otp_code');
-                removeData('otp_expiry');
-                removeData('pendingUser');
-                toast('Session expired — please retry', 3200);
-                setTimeout(() => location.reload(), 3400);
-            }
-        }, 1000);
+    // Push history state so phone back button works
+    history.pushState({ screen: id }, '', '#' + id.replace('Screen',''));
+}
+
+// Handle phone back button / browser back
+window.addEventListener('popstate', function(e) {
+    if (e.state && e.state.screen) {
+        _showScreenNoHistory(e.state.screen);
+    } else {
+        _showScreenNoHistory('signupScreen');
+    }
+});
+
+// Internal show without pushing history (used by popstate)
+function _showScreenNoHistory(id) {
+    document.querySelectorAll('.screen').forEach(s => s.style.display = 'none');
+    document.getElementById('authToggle').style.display = 'none';
+    if (document.getElementById(id)) {
+        document.getElementById(id).style.display = 'block';
+        currentScreen = id;
+    }
+    if (id === 'signupScreen' || id === 'signinScreen') {
+        document.getElementById('authToggle').style.display = 'flex';
+    }
+}
+
+function goBack() {
+    history.back();
+}
+
+// ══════════════════════════════════════════════════════════
+// TOGGLE SIGN UP / SIGN IN
+// ══════════════════════════════════════════════════════════
+function switchTab(tab) {
+    const toggle = document.getElementById('authToggle');
+    const btns = toggle.querySelectorAll('button');
+    if (tab === 'signup') {
+        toggle.classList.remove('signin');
+        btns[0].classList.add('active');
+        btns[1].classList.remove('active');
+        showScreen('signupScreen');
+    } else {
+        toggle.classList.add('signin');
+        btns[1].classList.add('active');
+        btns[0].classList.remove('active');
+        showScreen('signinScreen');
+    }
+}
+
+// ══════════════════════════════════════════════════════════
+// INIT
+// ══════════════════════════════════════════════════════════
+window.onload = async () => {
+    // Apply saved theme
+    if (loadData('bankapur_amoled') === 'true') {
+        document.body.classList.add('dark');
+        document.getElementById('themeColor').content = '#0a0a0a';
     }
 
-    // ── REQUEST ACCESS ──
-    async function requestLogin() {
-        const d = {
-            name:   document.getElementById('uName').value.trim(),
-            phone:  document.getElementById('uPhone').value.replace(/\D/g,'').trim(),
-            door:   document.getElementById('uDoor').value.trim(),
-            street: document.getElementById('uStreet').value.trim(),
-            area:   document.getElementById('uArea').value.trim(),
-            city:   'Harapanahalli'
-        };
-        if (!d.name)                            { toast('Enter your full name'); return; }
-        if (!d.phone || d.phone.length !== 10)  { toast('Phone must be exactly 10 digits'); return; }
-        if (!/^\d{10}$/.test(d.phone))          { toast('Phone must contain only digits'); return; }
-        if (!d.door)                            { toast('Enter your door number'); return; }
-        if (!d.street)                          { toast('Enter your street'); return; }
-        if (!d.area)                            { toast('Enter your area / locality'); return; }
-
-        const btn = document.getElementById('reqBtn');
-        btn.classList.add('loading');
-
-        const code = Math.floor(1000 + Math.random() * 9000).toString();
-
-        // Store OTP + expiry in localStorage (survives PWA close/reopen, unlike sessionStorage)
-        saveData('otp_code',   code);
-        saveData('otp_expiry', (Date.now() + 600000).toString()); // 10 min expiry
-
-        const msg = encodeURIComponent(
-            `🛒 Access Request\n👤 ${d.name}\n📞 ${d.phone}\n🏠 ${d.door}, ${d.street}, ${d.area}, ${d.city}\n🔑 CODE: ${code}`
-        );
-
-        try {
-            const res = await fetch(
-                `https://api.telegram.org/bot${BOT}/sendMessage?chat_id=${CHAT}&text=${msg}`
-            );
-            if (res.ok) {
-                saveData('pendingUser', JSON.stringify(d));
-                document.getElementById('loginScreen').style.display = 'none';
-                document.getElementById('otpScreen').style.display   = 'block';
-                document.getElementById('otpSub').textContent = `Code sent to ${d.phone}`;
-                startTimer();
-                setTimeout(() => document.getElementById('otp1').focus(), 200);
-            } else {
-                toast('Could not send code — try again');
-                btn.classList.remove('loading');
-            }
-        } catch {
-            toast('Network error — check your connection');
-            btn.classList.remove('loading');
-        }
+    // Already verified — go straight to store
+    if (loadData('userProfile')) {
+        window.location.href = 'stores.html';
+        return;
     }
 
-    // ── VERIFY OTP ──
-    function verifyAccess() {
-        const entered = ['otp1','otp2','otp3','otp4']
-            .map(id => document.getElementById(id).value).join('');
-
-        if (entered.length < 4) { toast('Enter all 4 digits'); return; }
-
-        if (entered === loadData('otp_code')) {
-            // Write profile permanently, then clean up temp auth keys
-            saveData('userProfile', loadData('pendingUser'));
-            removeData('pendingUser');
-            removeData('otp_code');
-            removeData('otp_expiry');
-            toast('Verified — welcome!');
-            setTimeout(() => { window.location.href = 'stores.html'; }, 800);
-        } else {
-            ['otp1','otp2','otp3','otp4'].forEach(id => {
-                const el = document.getElementById(id);
-                el.value = ''; el.classList.remove('v');
-            });
-            document.getElementById('otp1').focus();
-            const grid = document.querySelector('.otp-grid');
-            grid.classList.remove('shake');
-            void grid.offsetWidth;
-            grid.classList.add('shake');
-            toast('Incorrect code · Try again');
-        }
+    // Mid-flow: OTP pending
+    const pending   = loadData('pendingUser');
+    const savedOtp  = loadData('otp_code');
+    const otpExpiry = loadData('otp_expiry');
+    if (pending && savedOtp && otpExpiry && Date.now() < parseInt(otpExpiry)) {
+        const d = JSON.parse(pending);
+        showScreen('otpScreen');
+        document.getElementById('otpSub').textContent = `Code sent to ${d.phone}`;
+        const remaining = Math.floor((parseInt(otpExpiry) - Date.now()) / 1000);
+        startTimer(remaining);
+        setTimeout(() => document.getElementById('otp1').focus(), 200);
+        return;
     }
 
-    // ── GO BACK (clear stale auth state cleanly) ──
-    function clearAndReload() {
+    // Stale pending — clean up
+    if (pending) {
         removeData('pendingUser');
         removeData('otp_code');
         removeData('otp_expiry');
-        location.reload();
     }
+
+    // Set initial history state
+    history.replaceState({ screen: 'signupScreen' }, '', '#signup');
+
+    // Register service worker
+    if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js');
+};
+
+// ══════════════════════════════════════════════════════════
+// TOAST
+// ══════════════════════════════════════════════════════════
+function toast(msg, ms = 2600) {
+    const el = document.getElementById('toast');
+    el.textContent = msg;
+    el.classList.add('on');
+    clearTimeout(el._t);
+    el._t = setTimeout(() => el.classList.remove('on'), ms);
+}
+
+// ══════════════════════════════════════════════════════════
+// OTP INPUT HELPERS
+// ══════════════════════════════════════════════════════════
+function ho(el, nxtId) {
+    if (el.value.length > 1) el.value = el.value.slice(-1);
+    el.value = el.value.replace(/\D/g, '');
+    el.classList.toggle('v', !!el.value);
+    if (el.value && nxtId) document.getElementById(nxtId).focus();
+}
+function hb(e, el, prvId) {
+    if (e.key === 'Backspace' && !el.value && prvId) {
+        const p = document.getElementById(prvId);
+        p.value = ''; p.classList.remove('v'); p.focus();
+    }
+}
+
+// ══════════════════════════════════════════════════════════
+// COUNTDOWN TIMER
+// ══════════════════════════════════════════════════════════
+let timerInterval = null;
+function startTimer(seconds = 600) {
+    if (timerInterval) clearInterval(timerInterval);
+    let s = seconds;
+    const display = document.getElementById('timer');
+    timerInterval = setInterval(() => {
+        const m   = Math.floor(s / 60);
+        const sec = s % 60;
+        display.textContent = `${m < 10 ? '0' : ''}${m}:${sec < 10 ? '0' : ''}${sec}`;
+        if (--s < 0) {
+            clearInterval(timerInterval);
+            removeData('otp_code');
+            removeData('otp_expiry');
+            removeData('pendingUser');
+            toast('Session expired — please retry', 3200);
+            setTimeout(() => { showScreen('signupScreen'); }, 3400);
+        }
+    }, 1000);
+}
+
+// ══════════════════════════════════════════════════════════
+// GENERATE UNIQUE 6-DIGIT ID
+// ══════════════════════════════════════════════════════════
+function generateUniqueId() {
+    // Random 6-digit, starts from 100000
+    return Math.floor(100000 + Math.random() * 900000).toString();
+}
+
+// ══════════════════════════════════════════════════════════
+// REQUEST LOGIN (SIGN UP FLOW)
+// ══════════════════════════════════════════════════════════
+async function requestLogin() {
+    const d = {
+        name:   document.getElementById('uName').value.trim(),
+        phone:  document.getElementById('uPhone').value.replace(/\D/g,'').trim(),
+        door:   document.getElementById('uDoor').value.trim(),
+        street: document.getElementById('uStreet').value.trim(),
+        area:   document.getElementById('uArea').value.trim(),
+        city:   'Harapanahalli'
+    };
+    if (!d.name)                            { toast('Enter your full name'); return; }
+    if (!d.phone || d.phone.length !== 10)  { toast('Phone must be exactly 10 digits'); return; }
+    if (!/^\d{10}$/.test(d.phone))          { toast('Phone must contain only digits'); return; }
+    if (!d.door)                            { toast('Enter your door number'); return; }
+    if (!d.street)                          { toast('Enter your street'); return; }
+    if (!d.area)                            { toast('Enter your area / locality'); return; }
+
+    const btn = document.getElementById('reqBtn');
+    btn.classList.add('loading');
+
+    const code = Math.floor(1000 + Math.random() * 9000).toString();
+    const newId = generateUniqueId();
+
+    saveData('otp_code',   code);
+    saveData('otp_expiry', (Date.now() + 600000).toString());
+    saveData('pending_new_id', newId);
+
+    const msg = encodeURIComponent(
+        `🛒 New Registration\n👤 ${d.name}\n📞 ${d.phone}\n🏠 ${d.door}, ${d.street}, ${d.area}, ${d.city}\n🔑 OTP: ${code}`
+    );
+
+    try {
+        const res = await fetch(
+            `https://api.telegram.org/bot${BOT}/sendMessage?chat_id=${CHAT}&text=${msg}`
+        );
+        if (res.ok) {
+            saveData('pendingUser', JSON.stringify(d));
+            showScreen('otpScreen');
+            document.getElementById('otpSub').textContent = `Code sent to ${d.phone}`;
+            startTimer();
+            setTimeout(() => document.getElementById('otp1').focus(), 200);
+        } else {
+            toast('Could not send code — try again');
+            btn.classList.remove('loading');
+        }
+    } catch {
+        toast('Network error — check your connection');
+        btn.classList.remove('loading');
+    }
+}
+
+// ══════════════════════════════════════════════════════════
+// VERIFY OTP → go to set password
+// ══════════════════════════════════════════════════════════
+function verifyAccess() {
+    const entered = ['otp1','otp2','otp3','otp4']
+        .map(id => document.getElementById(id).value).join('');
+
+    if (entered.length < 4) { toast('Enter all 4 digits'); return; }
+
+    if (entered === loadData('otp_code')) {
+        if (timerInterval) clearInterval(timerInterval);
+        removeData('otp_code');
+        removeData('otp_expiry');
+
+        // Show set password screen with assigned ID
+        const assignedId = loadData('pending_new_id');
+        document.getElementById('displayId').textContent = assignedId;
+        showScreen('setPasswordScreen');
+    } else {
+        ['otp1','otp2','otp3','otp4'].forEach(id => {
+            const el = document.getElementById(id);
+            el.value = ''; el.classList.remove('v');
+        });
+        document.getElementById('otp1').focus();
+        const grid = document.querySelector('.otp-grid');
+        grid.classList.remove('shake');
+        void grid.offsetWidth;
+        grid.classList.add('shake');
+        toast('Incorrect code · Try again');
+    }
+}
+
+// ══════════════════════════════════════════════════════════
+// SET PASSWORD — finalize account
+// ══════════════════════════════════════════════════════════
+async function setPassword() {
+    const pass    = document.getElementById('newPass').value;
+    const confirm = document.getElementById('confirmPass').value;
+
+    if (!pass || pass.length < 4)    { toast('Password must be at least 4 characters'); return; }
+    if (pass !== confirm)            { toast('Passwords do not match'); return; }
+
+    const btn = document.getElementById('setPassBtn');
+    btn.classList.add('loading');
+
+    const pending   = JSON.parse(loadData('pendingUser') || '{}');
+    const assignedId = loadData('pending_new_id');
+    const encodedPhone = encodePhone(pending.phone || '');
+    const encodedId    = encodeId(assignedId);
+
+    // Build profile
+    const profile = {
+        name:    pending.name,
+        phone:   pending.phone,
+        door:    pending.door,
+        street:  pending.street,
+        area:    pending.area,
+        city:    pending.city,
+        id:      assignedId,
+        password: pass
+    };
+
+    // Save to localStorage permanently
+    saveData('userProfile', JSON.stringify(profile));
+    removeData('pendingUser');
+    removeData('pending_new_id');
+
+    // Send full details to Telegram so you can update gubugloo.js
+    const address = `${pending.door}, ${pending.street}, ${pending.area}, ${pending.city}`;
+    const msg = encodeURIComponent(
+        `✅ Account Created\n` +
+        `👤 ${pending.name}\n` +
+        `📞 ${pending.phone}\n` +
+        `🆔 ID: ${assignedId}\n` +
+        `🔑 Password: ${pass}\n` +
+        `🏠 ${address}\n\n` +
+        `📦 Storage Entry:\n` +
+        `D1: ${encodedPhone}#${encodedId}#${pass}\n` +
+        `D2: ${pending.name}#${address}`
+    );
+
+    try {
+        await fetch(`https://api.telegram.org/bot${BOT}/sendMessage?chat_id=${CHAT}&text=${msg}`);
+    } catch(e) { /* silent — profile already saved */ }
+
+    btn.classList.remove('loading');
+    toast('Account created — welcome!');
+    setTimeout(() => { window.location.href = 'stores.html'; }, 800);
+}
+
+// ══════════════════════════════════════════════════════════
+// SIGN IN — restore from gubugloo.js if needed
+// ══════════════════════════════════════════════════════════
+async function doSignIn() {
+    const identifier = document.getElementById('siIdentifier').value.replace(/\D/g,'').trim();
+    const password   = document.getElementById('siPassword').value.trim();
+
+    if (!identifier) { toast('Enter your phone or ID'); return; }
+    if (!password)   { toast('Enter your password'); return; }
+
+    const btn = document.getElementById('siBtn');
+    btn.classList.add('loading');
+
+    // 1) Try localStorage first
+    const saved = loadData('userProfile');
+    if (saved) {
+        const p = JSON.parse(saved);
+        const matchPhone = p.phone === identifier;
+        const matchId    = p.id    === identifier;
+        if ((matchPhone || matchId) && p.password === password) {
+            btn.classList.remove('loading');
+            toast('Welcome back!');
+            setTimeout(() => { window.location.href = 'stores.html'; }, 700);
+            return;
+        }
+    }
+
+    // 2) Try restoring from gubugloo.js (GitHub)
+    try {
+        const restored = await fetchFromStorage(identifier, password);
+        if (restored) {
+            saveData('userProfile', JSON.stringify(restored));
+            btn.classList.remove('loading');
+            toast('Data restored — welcome back!');
+            setTimeout(() => { window.location.href = 'stores.html'; }, 800);
+            return;
+        }
+    } catch(e) { /* network error — fall through */ }
+
+    btn.classList.remove('loading');
+
+    const siForm = document.querySelector('#signinScreen .card');
+    siForm.classList.remove('shake');
+    void siForm.offsetWidth;
+    siForm.classList.add('shake');
+    toast('Incorrect details · Try again');
+}
+
+// ══════════════════════════════════════════════════════════
+// FETCH & DECODE FROM GUBUGLOO.JS
+// ══════════════════════════════════════════════════════════
+async function fetchFromStorage(identifier, password) {
+    // Raw URL for the file
+    const url = 'https://raw.githubusercontent.com/Nikhil007-eng/BDAY/main/gubugloo.js';
+
+    const res = await fetch(url + '?t=' + Date.now()); // cache bust
+    if (!res.ok) return null;
+
+    const text = await res.text();
+
+    // Parse D1 and D2 arrays from the JS file
+    // Expected format in gubugloo.js:
+    //   const D1=["XAYGTUZNBE#ZEZEBX#mypass","..."];
+    //   const D2=["Nikhil#Door 4, Main St, Area, Harapanahalli","..."];
+
+    const d1Match = text.match(/const\s+D1\s*=\s*(\[[\s\S]*?\]);/);
+    const d2Match = text.match(/const\s+D2\s*=\s*(\[[\s\S]*?\]);/);
+    if (!d1Match || !d2Match) return null;
+
+    let D1, D2;
+    try {
+        D1 = JSON.parse(d1Match[1]);
+        D2 = JSON.parse(d2Match[1]);
+    } catch(e) { return null; }
+
+    // Determine if identifier is phone (10 digits) or ID (6 digits)
+    const isPhone = identifier.length === 10;
+    const encodedInput = isPhone ? encodePhone(identifier) : encodeId(identifier);
+
+    for (let i = 0; i < D1.length; i++) {
+        const parts = D1[i].split('#');
+        if (parts.length < 3) continue;
+
+        const storedEncPhone = parts[0]; // encoded phone
+        const storedEncId    = parts[1]; // encoded id
+        const storedPass     = parts[2];
+
+        const inputMatchesPhone = isPhone && storedEncPhone === encodedInput;
+        const inputMatchesId    = !isPhone && storedEncId === encodedInput;
+
+        if ((inputMatchesPhone || inputMatchesId) && storedPass === password) {
+            // Decode
+            const phone = decodePhone(storedEncPhone);
+            const id    = decodePhone(storedEncId); // id uses same digit encoding
+
+            // Get name + address from D2
+            const d2parts = (D2[i] || '').split('#');
+            const name    = d2parts[0] || '';
+            const address = d2parts[1] || '';
+
+            // Parse address back to fields (best effort)
+            const addrParts = address.split(',').map(s => s.trim());
+
+            return {
+                name:     name,
+                phone:    phone,
+                door:     addrParts[0] || '',
+                street:   addrParts[1] || '',
+                area:     addrParts[2] || '',
+                city:     addrParts[3] || 'Harapanahalli',
+                id:       id,
+                password: password
+            };
+        }
+    }
+    return null;
+}
+
+// ══════════════════════════════════════════════════════════
+// FORGOT / CONTACT SCREEN
+// ══════════════════════════════════════════════════════════
+function showForgot() {
+    showScreen('forgotScreen');
+}
+
+// ══════════════════════════════════════════════════════════
+// CLEAR & RELOAD
+// ══════════════════════════════════════════════════════════
+function clearAndReload() {
+    removeData('pendingUser');
+    removeData('otp_code');
+    removeData('otp_expiry');
+    removeData('pending_new_id');
+    showScreen('signupScreen');
+    // Reset toggle to signup
+    const toggle = document.getElementById('authToggle');
+    toggle.classList.remove('signin');
+    const btns = toggle.querySelectorAll('button');
+    btns[0].classList.add('active');
+    btns[1].classList.remove('active');
+}
 </script>
 </body>
 </html>
