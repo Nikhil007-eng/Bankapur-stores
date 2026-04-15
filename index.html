@@ -1154,5 +1154,28 @@ function clearAndReload() {
     btns[1].classList.remove('active');
 }
 </script>
+    <script>
+// Temporary mobile debug
+window.showDebug = function(msg) {
+    alert('DEBUG: ' + msg);
+};
+// Override fetchFromStorage to use alert
+const originalFetch = fetchFromStorage;
+fetchFromStorage = async function(id, pass) {
+    try {
+        showDebug('Fetching...');
+        const result = await originalFetch(id, pass);
+        if (result) {
+            showDebug('✅ Match found!');
+        } else {
+            showDebug('❌ No match. Check console?');
+        }
+        return result;
+    } catch(e) {
+        showDebug('Error: ' + e.message);
+        return null;
+    }
+};
+    </script>
 </body>
 </html>
