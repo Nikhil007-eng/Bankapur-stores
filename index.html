@@ -1061,74 +1061,108 @@ async function doSignIn() {
 }
 
 // ══════════════════════════════════════════════════════════
-// FETCH & DECODE FROM GUBUGLOO.JS
+// FETCH & DECODE FROM GUBUGLOO.JS (with mobile debug panel)
 // ══════════════════════════════════════════════════════════
 async function fetchFromStorage(identifier, password) {
-    // Raw URL for the file
+    const debugDiv = document.createElement('div');
+    debugDiv.style.cssText = 'position:fixed;top:10px;left:10px;right:10px;background:#111;color:#0f0;padding:12px;border-radius:12px;font-size:12px;z-index:9999;max-height:80vh;overflow:auto;white-space:pre-wrap;font-family:monospace;border:1px solid #333;';
+    document.body.appendChild(debugDiv);
+    
+    const log = (msg) => { debugDiv.innerHTML += msg + '\n'; };
+    
+    log('🔍 Debug: fetchFromStorage called');
+    log('Identifier: ' + identifier);
+    log('Password: ' + password);
+    
     const url = 'https://raw.githubusercontent.com/Nikhil007-eng/BDAY/main/gubugloo.js';
-
-    const res = await fetch(url + '?t=' + Date.now()); // cache bust
-    if (!res.ok) return null;
-
-    const text = await res.text();
-
-    // Parse D1 and D2 arrays from the JS file
-    // Expected format in gubugloo.js:
-    //   const D1=["XAYGTUZNBE#ZEZEBX#mypass","..."];
-    //   const D2=["Nikhil#Door 4, Main St, Area, Harapanahalli","..."];
-
-    const d1Match = text.match(/const\s+D1\s*=\s*(\[[\s\S]*?\]);/);
-    const d2Match = text.match(/const\s+D2\s*=\s*(\[[\s\S]*?\]);/);
-    if (!d1Match || !d2Match) return null;
-
-    let D1, D2;
+    log('Fetching: ' + url);
+    
     try {
-        D1 = JSON.parse(d1Match[1]);
-        D2 = JSON.parse(d2Match[1]);
-    } catch(e) { return null; }
-
-    // Determine if identifier is phone (10 digits) or ID (6 digits)
-    const isPhone = identifier.length === 10;
-    const encodedInput = isPhone ? encodePhone(identifier) : encodeId(identifier);
-
-    for (let i = 0; i < D1.length; i++) {
-        const parts = D1[i].split('#');
-        if (parts.length < 3) continue;
-
-        const storedEncPhone = parts[0]; // encoded phone
-        const storedEncId    = parts[1]; // encoded id
-        const storedPass     = parts[2];
-
-        const inputMatchesPhone = isPhone && storedEncPhone === encodedInput;
-        const inputMatchesId    = !isPhone && storedEncId === encodedInput;
-
-        if ((inputMatchesPhone || inputMatchesId) && storedPass === password) {
-            // Decode
-            const phone = decodePhone(storedEncPhone);
-            const id    = decodePhone(storedEncId); // id uses same digit encoding
-
-            // Get name + address from D2
-            const d2parts = (D2[i] || '').split('#');
-            const name    = d2parts[0] || '';
-            const address = d2parts[1] || '';
-
-            // Parse address back to fields (best effort)
-            const addrParts = address.split(',').map(s => s.trim());
-
-            return {
-                name:     name,
-                phone:    phone,
-                door:     addrParts[0] || '',
-                street:   addrParts[1] || '',
-                area:     addrParts[2] || '',
-                city:     addrParts[3] || 'Harapanahalli',
-                id:       id,
-                password: password
-            };
+        const res = await fetch(url + '?t=' + Date.now());
+        if (!res.ok) {
+            log('❌ Fetch failed: ' + res.status);
+            return null;
         }
+        log('✅ Fetch OK');
+        
+        const text = await res.text();
+        log('File size: ' + text.length + ' chars');
+        
+        const d1Match = text.match(/const\s+D1\s*=\s*(\[[\s\S]*?\]);/);
+        const d2Match = text.match(/const\s+D2\s*=\s*(\[[\s\S]*?\]);/);
+        if (!d1Match || !d2Match) {
+            log('❌ D1 or D2 not found in file');
+            return null;
+        }
+        
+        let D1, D2;
+        try {
+            D1 = JSON.parse(d1Match[1]);
+            D2 = JSON.parse(d2Match[1]);
+            log('D1 entries: ' + D1.length);
+            log('D2 entries: ' + D2.length);
+        } catch(e) {
+            log('❌ JSON parse error: ' + e);
+            return null;
+        }
+        
+        const isPhone = identifier.length === 10;
+        const encodedInput = isPhone ? encodePhone(identifier) : encodeId(identifier);
+        log('Input type: ' + (isPhone ? 'Phone' : 'ID'));
+        log('Encoded input: ' + encodedInput);
+        
+        for (let i = 0; i < D1.length; i++) {
+            const parts = D1[i].split('#');
+            if (parts.length < 3) continue;
+            const storedEncPhone = parts[0];
+            const storedEncId    = parts[1];
+            const storedPass     = parts[2];
+            
+            log(`Entry ${i}:`);
+            log(`  Phone(enc): ${storedEncPhone}`);
+            log(`  ID(enc)   : ${storedEncId}`);
+            log(`  Password  : ${storedPass}`);
+            
+            const phoneMatch = isPhone && storedEncPhone === encodedInput;
+            const idMatch    = !isPhone && storedEncId === encodedInput;
+            const passMatch  = storedPass === password;
+            
+            log(`  Phone match: ${phoneMatch}, ID match: ${idMatch}, Pass match: ${passMatch}`);
+            
+            if ((phoneMatch || idMatch) && passMatch) {
+                log('✅✅ MATCH FOUND at index ' + i);
+                const phone = decodePhone(storedEncPhone);
+                const id    = decodePhone(storedEncId);
+                const d2parts = (D2[i] || '').split('#');
+                const name    = d2parts[0] || '';
+                const address = d2parts[1] || '';
+                const addrParts = address.split(',').map(s => s.trim());
+                
+                // Clean up debug panel after 3 seconds
+                setTimeout(() => debugDiv.remove(), 3000);
+                
+                return {
+                    name:     name,
+                    phone:    phone,
+                    door:     addrParts[0] || '',
+                    street:   addrParts[1] || '',
+                    area:     addrParts[2] || '',
+                    city:     addrParts[3] || 'Harapanahalli',
+                    id:       id,
+                    password: password
+                };
+            }
+        }
+        
+        log('❌ No match after checking all entries');
+        // Keep debug visible so you can read it
+        return null;
+        
+    } catch(e) {
+        log('🔥 Fetch error: ' + e.message);
+        return null;
     }
-    return null;
-}
+                        }
 
 // ══════════════════════════════════════════════════════════
 // FORGOT / CONTACT SCREEN
