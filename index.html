@@ -533,9 +533,10 @@
                 <input type="text" id="siIdentifier" inputmode="numeric" placeholder=""
                        oninput="this.value=this.value.replace(/\D/g,'').slice(0,10)">
             </div>
-            <div class="field">
+            <div class="field" style="position:relative;">
                 <label>Password</label>
-                <input type="password" id="siPassword" placeholder="">
+                <input type="password" id="siPassword" placeholder="" style="padding-right:44px;">
+                <span onclick="togglePw()" style="position:absolute;right:13px;top:50%;transform:translateY(-50%);font-size:13px;color:var(--text-3);cursor:pointer;user-select:none;" id="pwEye">Show</span>
             </div>
 
             <button class="btn" id="siBtn" onclick="doSignIn()">
@@ -1017,7 +1018,7 @@ async function setPassword() {
 // ══════════════════════════════════════════════════════════
 async function doSignIn() {
     const identifier = document.getElementById('siIdentifier').value.replace(/\D/g,'');
-    const password   = document.getElementById('siPassword').value;
+    const password   = document.getElementById('siPassword').value.trim();
 
     if (!identifier) { toast('Enter your phone or ID'); return; }
     if (!password)   { toast('Enter your password'); return; }
@@ -1157,6 +1158,13 @@ async function fetchFromStorage(identifier, password) {
         }
     }
     return null;
+}
+
+function togglePw() {
+    const inp = document.getElementById('siPassword');
+    const eye = document.getElementById('pwEye');
+    if (inp.type === 'password') { inp.type = 'text'; eye.textContent = 'Hide'; }
+    else { inp.type = 'password'; eye.textContent = 'Show'; }
 }
 
 // ══════════════════════════════════════════════════════════
