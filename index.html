@@ -1066,7 +1066,7 @@ async function doSignIn() {
 // ══════════════════════════════════════════════════════════
 async function fetchFromStorage(identifier, password) {
     // Raw URL for the file
-    const url = 'https://raw.githubusercontent.com/Nikhil007-eng/BDAY/main/gubugloo.js';
+    const url = 'https://nikhil007-eng.github.io/BDAY/main/gubugloo.js';
 
     const res = await fetch(url + '?t=' + Date.now()); // cache bust
     if (!res.ok) return null;
