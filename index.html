@@ -1016,8 +1016,8 @@ async function setPassword() {
 // SIGN IN — restore from gubugloo.js if needed
 // ══════════════════════════════════════════════════════════
 async function doSignIn() {
-    const identifier = document.getElementById('siIdentifier').value.replace(/\D/g,'').trim();
-    const password   = document.getElementById('siPassword').value.trim();
+    const identifier = document.getElementById('siIdentifier').value.replace(/\D/g,'');
+    const password   = document.getElementById('siPassword').value;
 
     if (!identifier) { toast('Enter your phone or ID'); return; }
     if (!password)   { toast('Enter your password'); return; }
@@ -1065,7 +1065,7 @@ async function doSignIn() {
 // ══════════════════════════════════════════════════════════
 async function fetchFromStorage(identifier, password) {
     // Raw URL for the file
-    const url = 'https://raw.githubusercontent.com/Nikhil007-eng/BDAY/main/main/gubugloo.js';
+    const url = 'https://raw.githubusercontent.com/Nikhil007-eng/BDAY/main/gubugloo.js';
 
     const res = await fetch(url + '?t=' + Date.now()); // cache bust
     if (!res.ok) return null;
@@ -1077,14 +1077,43 @@ async function fetchFromStorage(identifier, password) {
     //   const D1=["XAYGTUZNBE#ZEZEBX#mypass","..."];
     //   const D2=["Nikhil#Door 4, Main St, Area, Harapanahalli","..."];
 
-    const d1Match = text.match(/const\s+D1\s*=\s*(\[[\s\S]*?\]);/);
-    const d2Match = text.match(/const\s+D2\s*=\s*(\[[\s\S]*?\]);/);
-    if (!d1Match || !d2Match) return null;
+    const d1Match = text.match(/const\s+D1\s*=\s*(\[[\s\S]*?\]);(?:\s|\/\/[^\n]*\n|$)/);
+    const d2Match = text.match(/const\s+D2\s*=\s*(\[[\s\S]*?\]);(?:\s|\/\/[^\n]*\n|$)/);
+
+    // Greedy bracket matching to get full array even with multiple entries
+    function extractArray(src, varName) {
+        const start = src.indexOf(`const ${varName}`);
+        if (start === -1) return null;
+        const bracketStart = src.indexOf('[', start);
+        if (bracketStart === -1) return null;
+        let depth = 0, i = bracketStart, inStr = false, strChar = '';
+        for (; i < src.length; i++) {
+            const c = src[i];
+            if (inStr) {
+                if (c === strChar && src[i-1] !== '\\') inStr = false;
+            } else {
+                if (c === '"' || c === "'") { inStr = true; strChar = c; }
+                else if (c === '[') depth++;
+                else if (c === ']') { depth--; if (depth === 0) break; }
+                else if (c === '/' && src[i+1] === '/') {
+                    // skip line comment
+                    while (i < src.length && src[i] !== '\n') i++;
+                }
+            }
+        }
+        const raw = src.slice(bracketStart, i + 1);
+        // Strip single-line comments from inside array before JSON parse
+        const cleaned = raw.replace(/\/\/[^\n]*/g, '').replace(/,\s*]/g, ']');
+        return cleaned;
+    }
 
     let D1, D2;
     try {
-        D1 = JSON.parse(d1Match[1]);
-        D2 = JSON.parse(d2Match[1]);
+        const raw1 = extractArray(text, 'D1');
+        const raw2 = extractArray(text, 'D2');
+        if (!raw1 || !raw2) return null;
+        D1 = JSON.parse(raw1);
+        D2 = JSON.parse(raw2);
     } catch(e) { return null; }
 
     // Determine if identifier is phone (10 digits) or ID (6 digits)
